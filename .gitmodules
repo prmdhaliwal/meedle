@@ -1,0 +1,4 @@
+[submodule "CL_Friday4pm_Team3"]
+	path = CL_Friday4pm_Team3
+	url = https://git.infotech.monash.edu/fit2101/fit2101-s2-2025/group-repo/CL_Friday4pm_Team3.git
+	branch = param-test
