@@ -48,6 +48,10 @@ class Frame(FrameTemplate):
   #   anvil.users.logout()
   #   open_form('Logout')
 
+  def button_1_click(self, **event_args):
+    """This method is called when the button is clicked"""
+    pass
+
 
 
 
