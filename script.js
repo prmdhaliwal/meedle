@@ -35,16 +35,16 @@ document.addEventListener('DOMContentLoaded', function() {
         // Get form values
         const title = document.getElementById('title').value;
         const description = document.getElementById('description').value;
-        const dueDate = document.getElementById('dueDate').value;
-        const course = document.getElementById('course').value;
+        const weighting = document.getElementById('weighting').value;
+        const lessonId = document.getElementById('lessonId').value;
         
         // Create assignment object
         const assignment = {
             id: Date.now(), // unique ID
             title,
             description,
-            dueDate,
-            course
+            weighting,
+            lessonId
         };
         
         // Add to assignments array
@@ -74,18 +74,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const assignmentElement = document.createElement('div');
             assignmentElement.classList.add('assignment-item');
             
-            // Format the date for display
-            const dueDate = new Date(assignment.dueDate).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
             
             assignmentElement.innerHTML = `
                 <h3>${assignment.title}</h3>
-                <p><strong>Course:</strong> ${assignment.course}</p>
                 <p>${assignment.description}</p>
-                <p><strong>Due:</strong> <span class="due-date">${dueDate}</span></p>
+                <p><strong>Weighting:</strong> ${assignment.weighting}%</p>
+                <p><strong>Lesson ID:</strong> ${assignment.lessonId}</p>
             `;
             
             assignmentList.appendChild(assignmentElement);
