@@ -1,14 +1,20 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Student Assignment Submission</title>
-  </head>
-  <body>
-    <h1>Assignment Submission Page</h1>
+<head>
+  <title>Student Assignment Submission</title>
+  <style>
+    body { padding: 20px; }
+    .form-box { border: 1px solid ; padding: 20px; border-radius: 8px; width: 300px; }
+  </style>
+</head>
+<body>
+  <h1>Assignment Submission Page</h1>
+  <div class="form-box">
     <form>
-      <label for="assignment">Choose file:</label>
+      <label for="assignment">Upload your assignment:</label><br>
       <input type="file" id="assignment" name="assignment"><br><br>
       <button type="submit">Submit</button>
     </form>
-  </body>
+  </div>
+</body>
 </html>
