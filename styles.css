@@ -1,14 +1,8 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
 body {
     background-color: #f5f7fa;
     color: #333;
     line-height: 1.6;
-    padding: 20px;
+    margin: 0;
 }
 
 header {
@@ -62,6 +56,7 @@ button {
     z-index: 999;
     align-items: center;
     justify-content: center;
+    border: 1px black;
 }
 
 .modal-header {
@@ -71,6 +66,10 @@ button {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.modal #assignmentForm {
+    padding: 20px;
 }
 
 textarea {
