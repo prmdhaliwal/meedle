@@ -4,8 +4,7 @@ const router = express.Router();
 require("../models/course"); // register Course model
 const Enrollment = require("../models/enrollment");
 const Course = require("../models/course");
-const studentcourses = require("../models/studentcourses");
-app.use("/student", studentcourses);
+const studentcourses = require("../routes/studentcourses");
 
 function requireLogin(req, res, next) {
   if (!global.currentUser) return res.redirect("/auth/login");
