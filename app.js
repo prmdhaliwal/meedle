@@ -9,6 +9,10 @@ app.use(express.urlencoded({ extended: true }));
 // Routers
 const authRoutes = require("./routes/auth");
 
+//References to the static assets
+app.use(express.static("node_modules/bootstrap/dist/css"));
+app.use(express.static("images")); //This one means statics are in images folder. So paths will just be /porsche.jpg for example rather than absolute paths
+// app.use(express.static("scripts"));
 
 // Configure EJS
 app.engine("html", ejs.renderFile);
@@ -38,7 +42,7 @@ app.use((req, res, next) => {
 
 app.get("/", (req, res) => {
     if (currentUser) {
-        return res.render("index", {title: "Index Page" }); 
+        return res.render("index"); 
     } else {
         return res.redirect("/auth/login");
     }
