@@ -3,12 +3,32 @@ const express = require("express");
 const router = express.Router();
 require("../models/course"); // register Course model
 const Enrollment = require("../models/enrollment");
-
+const Course = require("../models/course");
 
 function requireLogin(req, res, next) {
   if (!global.currentUser) return res.redirect("/auth/login");
   next();
 }
+
+router.get("/manage-enrollments", requireLogin, async (req, res) => {
+  try {
+    const me = global.currentUser;
+
+    const [courses, enrolls] = await Promise.all([
+      Course.find({}).lean(),
+      Enrollment.find({ student: me._id }).lean(),
+    ]);
+
+    const enrolledIds = new Set(enrolls.map(e => String(e.course)));
+    const msg = req.query.msg || "";
+
+    res.render("manage-enrollments", { user: me, courses, enrolledIds, msg });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
 
 router.get("/courses", requireLogin, async (req, res) => {
   try {
