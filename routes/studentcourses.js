@@ -4,6 +4,8 @@ const router = express.Router();
 require("../models/course"); // register Course model
 const Enrollment = require("../models/enrollment");
 const Course = require("../models/course");
+const studentcourses = require("../models/studentcourses");
+app.use("/student", studentcourses);
 
 function requireLogin(req, res, next) {
   if (!global.currentUser) return res.redirect("/auth/login");
@@ -59,4 +61,41 @@ router.get("/api/my-courses", requireLogin, async (req, res) => {
   }
 });
 
+// sending stuff back to MONGODB
+//enrolling 
+router.post("/enroll", requireLogin, async (req, res) => {
+  try {
+    const me = global.currentUser;
+    const { courseCode } = req.body;
+
+    const course = await Course.findOne({ code: courseCode });
+    if (!course) return res.redirect("/student/manage-enrollments?msg=Course%20not%20found");
+
+    await Enrollment.updateOne(
+      { student: me._id, course: course._id },
+      { $setOnInsert: { student: me._id, course: course._id } },
+      { upsert: true }
+    );
+
+    return res.redirect("/student/manage-enrollments?msg=Enrolled%20in%20" + encodeURIComponent(course.code));
+  } catch (err) {
+    console.error(err);
+    return res.redirect("/student/manage-enrollments?msg=Error%20enrolling");
+  }
+});
+
+// unenrolling
+router.post("/unenroll", requireLogin, async (req, res) => {
+  try {
+    const me = global.currentUser;
+    const { courseId } = req.body;
+
+    await Enrollment.deleteOne({ student: me._id, course: courseId });
+
+    return res.redirect("/student/manage-enrollments?msg=Unenrolled");
+  } catch (err) {
+    console.error(err);
+    return res.redirect("/student/manage-enrollments?msg=Error%20unenrolling");
+  }
+});
 module.exports = router;
