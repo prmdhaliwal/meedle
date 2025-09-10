@@ -22,11 +22,13 @@ async function connectDB(url){
 };
 connectDB(URL).then(console.log).catch(err => console.log(err))
 
+
 // Global variable to store the current user
 let currentUser = null;
 function setCurrentUser(user) {
   currentUser = user;
 }
+global.setCurrentUser = setCurrentUser; // Make it globally accessible
 // =============================================================================================================
 // Middleware to make it available in EJS
 app.use((req, res, next) => {
@@ -36,7 +38,7 @@ app.use((req, res, next) => {
 
 app.get("/", (req, res) => {
     if (currentUser) {
-        return res.render("index"); 
+        return res.render("index", {title: "Index Page" }); 
     } else {
         return res.redirect("/auth/login");
     }

@@ -7,6 +7,23 @@ router.get("/login", function(req, res) {
   res.render("login"); 
 });
 
+router.post("/login", async function(req, res) {
+    // const { email, password } = req.body;
+    // const user
+
+    // = await User    .findOne({ email, password });
+    // if (!user) {
+    //     return res.send("Invalid email or password");
+    // }
+    // save in global variable
+
+    //for now just allow the thing
+    global.setCurrentUser("dummy");   
+
+    // redirect to home page
+    return res.redirect("/");
+});
+
 module.exports = router;
 
 
