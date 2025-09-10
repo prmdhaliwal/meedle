@@ -61,8 +61,6 @@ app.use("/teacher", teacherRouter);
 app.use("/auth", authRouter); 
 
 
-
-
 app.listen(PORT_NUMBER, function(){
     console.log("Listening at http://localhost:" + PORT_NUMBER);
 } );
