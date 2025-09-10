@@ -20,8 +20,12 @@ router.post("/login", async function(req, res) {
     } 
     global.setCurrentUser(user); // set the global variable
 
-    // redirect to home page
-    return res.redirect("/");
+    //redirect based on student or teacher
+    if (user.role === "teacher") {
+      return res.redirect("/teacher");
+    } else { //student
+      return res.redirect("/student");
+    }
 });
 // ========================================================================================================================================
 /** REGISTER SECTION */
@@ -46,8 +50,8 @@ router.post("/register", async function(req, res) {
       name,
       email,  
       password,
-      isAdmin: false, // for simplicity, all new users are not admins until manually changed in MongoDB
-      gender
+      gender,
+      role: "student"
     });
 
     await newUser.save();
@@ -70,7 +74,7 @@ router.post("/set-password", async function(req, res) {
     // If the instructor hasn't set a password yet: set password
     if (!user.password) {
       user.password = password;
-      user.isAdmin = true; // should already be set but can't hurt to be sure
+      user.role = "teacher"; // set role to teacher
       await user.save();
       return res.render("login", {error: 'Instructor password set successfully! You can now log in.', positive: true});
 

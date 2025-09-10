@@ -6,7 +6,9 @@ const PORT_NUMBER = 8080;
 app.use(express.urlencoded({ extended: true }));
 
 // Routers
-const authRoutes = require("./routes/auth");
+const authRouter = require("./routes/auth");
+const studentRouter = require("./routes/student");
+const teacherRouter = require("./routes/teacher");
 
 //References to the static assets
 app.use(express.static("node_modules/bootstrap/dist/css"));
@@ -18,7 +20,9 @@ app.engine("html", ejs.renderFile);
 app.set("view engine", "html");
 
 // Configure Mongoose
-const URL = "mongodb://127.0.0.1:27017/fit2101_lms";
+// const URL = "mongodb://127.0.0.1:27017/fit2101_lms";
+const URL = "mongodb://127.0.0.1:27017/fit2101_lms"
+
 async function connectDB(url){
     await mongoose.connect(url);
     return("Connected successfully");
@@ -42,15 +46,19 @@ app.use((req, res, next) => {
 
 app.get("/", (req, res) => {
     if (currentUser) {
-        return res.render("index"); 
+        if (currentUser.role === "teacher") {
+            return res.redirect("/teacher");
+        } else { //student 
+            return res.redirect("/student");
+        }
     } else {
         return res.redirect("/auth/login");
     }
 });   
 
-app.use("/auth", authRoutes); 
-
-
+app.use("/student", studentRouter);
+app.use("/teacher", teacherRouter);
+app.use("/auth", authRouter); 
 
 
 
