@@ -4,8 +4,10 @@ const mongoose = require("mongoose");
 const app = express();
 const PORT_NUMBER = 8080;
 const studentCourses = require("./routes/studentcourses")
-app.use("/student", studentCourses);
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use("/student", studentCourses);
+
 
 // Routers
 const authRoutes = require("./routes/auth");
@@ -51,11 +53,6 @@ app.get("/", (req, res) => {
 });   
 
 app.use("/auth", authRoutes); 
-
-
-
-
-
 
 app.listen(PORT_NUMBER, function(){
     console.log("Listening at http://localhost:" + PORT_NUMBER);
