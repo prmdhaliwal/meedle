@@ -1,0 +1,71 @@
+<%- include('partials/header') %>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Edit Details</title>
+    <link href="/bootstrap.min.css" rel="stylesheet" />
+  </head>
+
+  <body class="bg-light">
+    <main>
+
+      <div class="album p-3 mb-5 bg-primary w-50 mx-auto">
+        <h1 class="text-center text-white">Edit Details</h1>
+      </div>
+      
+      <div>
+        <div class="container mb-5 d-flex justify-content-center">
+          <div class="col-4">
+            <div class="card shadow">
+                <div class="card-body">
+
+              <!-- FORM -->
+              <form action="/auth/edit-details" method="POST">
+                <div>
+                  <label for="name" class="form-label">Name:</label>
+                  <input type="text" id="name" name="name" value="<%= user.name %>"%> class="form-control" required />
+                </div>
+
+                <div>
+                  <label for="email" class="form-label">Email:</label>
+                  <input type="email" id="email" name="email" value="<%= user.email %>" class="form-control" required />
+                </div>
+
+                <div>
+                  <label for="password" class="form-label">Password:</label>
+                  <input type="password" id="password" name="password" value="<%= user.password %>" class="form-control" required />
+                </div>
+
+                <!-- Gender drop down -->
+                <div>
+                    <label for="gender" class="form-label">Gender</label>
+                    <select id="gender" name="gender" class="form-select" value="<%= user.gender%>" required>
+                        <option value="" selected disabled>Select gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary my-3">Done</button>
+              </form>
+
+              <% if (typeof error !== 'undefined') { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <%= error %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% } %>
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
+
+<%- include('partials/footer') %>

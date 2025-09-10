@@ -30,6 +30,7 @@ connectDB(URL).then(console.log).catch(err => console.log(err))
 let currentUser = null;
 function setCurrentUser(user) {
   currentUser = user;
+  global.currentUser = user; // update global variable
 }
 global.setCurrentUser = setCurrentUser; // Make it globally accessible
 // =============================================================================================================
@@ -49,22 +50,6 @@ app.get("/", (req, res) => {
 
 app.use("/auth", authRoutes); 
 
-
-
-/**
- * Can be added to an app.use in a route to require they log in first */
-function requireLogin(req, res, next) {
-  if (!currentUser) {
-    return res.redirect('/login'); // Adjust '/login' to your actual login route
-  }
-  next();
-}
-// Example of protecting a route
-// app.use('/protected-route', requireLogin, (req, res) => {
-//   // ...existing code for protected route...
-// });
-
-// app.use("/", authRoutes);
 
 
 

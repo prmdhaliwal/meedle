@@ -83,6 +83,39 @@ router.post("/set-password", async function(req, res) {
 });
 
 // // ========================================================================================================================================  
+// Edit/ change details
+
+router.get("/edit-details", function(req, res) {
+  if (!global.currentUser) {
+    console.log("User not logged in");
+    
+    return res.redirect("/auth/login");
+  }
+
+  res.render("edit-details", { user: global.currentUser });
+});
+
+router.post("/edit-details", async function(req, res) {
+  if (!global.currentUser) {
+    return res.redirect("/auth/login");
+  }
+
+  const { name, email, password, gender } = req.body;
+  const user = await User.findById(global.currentUser._id);
+
+  if (!user) {
+    return res.redirect("/auth/login");
+  }
+
+  user.name = name;
+  user.email = email;
+  user.password = password;
+  user.gender = gender;
+
+  await user.save();
+  res.render("edit-details", {error : "Details updated successfully!"});
+});
+
 //  TODO
     // logout route
 module.exports = router;
