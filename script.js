@@ -34,7 +34,8 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
        
-        assignments.push(assignment);
+        assignments.push(assignment); // This will need to connect to database
+        // before renderAssignments, need method to get assignments from database
         renderAssignments();
         assignmentForm.reset();
         assignmentModal.style.display = 'none';
