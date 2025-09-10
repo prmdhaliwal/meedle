@@ -82,7 +82,7 @@ router.post("/set-password", async function(req, res) {
   res.render("login", {error: 'No instructor email exists'});  
 });
 
-// // ========================================================================================================================================  
+// ========================================================================================================================================  
 // Edit/ change details
 
 router.get("/edit-details", function(req, res) {
@@ -101,7 +101,7 @@ router.post("/edit-details", async function(req, res) {
   }
 
   const { name, email, password, gender } = req.body;
-  const user = await User.findById(global.currentUser._id);
+  let user = await User.findById(global.currentUser._id);
 
   if (!user) {
     return res.redirect("/auth/login");
@@ -113,11 +113,21 @@ router.post("/edit-details", async function(req, res) {
   user.gender = gender;
 
   await user.save();
+
+  // Update the global currentUser variable
+  user = await User.findById(global.currentUser._id);
+  global.setCurrentUser(user);
+
   res.render("edit-details", {error : "Details updated successfully!"});
 });
 
-//  TODO
-    // logout route
+// ========================================================================================================================================  
+// LOGOUT
+router.get("/logout", function(req, res) {
+  global.setCurrentUser(null);
+  res.redirect("/auth/login");
+});
+
 module.exports = router;
 
 
