@@ -3,6 +3,8 @@ const ejs = require("ejs");
 const mongoose = require("mongoose");
 const app = express();
 const PORT_NUMBER = 8080;
+const studentCourses = require("./routes/studentcourses")
+app.use("/student", studentCourses);
 app.use(express.urlencoded({ extended: true }));
 
 // Routers
@@ -18,7 +20,7 @@ app.engine("html", ejs.renderFile);
 app.set("view engine", "html");
 
 // Configure Mongoose
-const URL = "mongodb://127.0.0.1:27017/fit2101_lms";
+const URL = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/fit2101_lms";
 async function connectDB(url){
     await mongoose.connect(url);
     return("Connected successfully");
