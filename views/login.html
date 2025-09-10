@@ -34,10 +34,22 @@
                             <input type="password" id="password" name="password" class="form-control" required />
                         </div>
 
-                        <button type="submit" class="btn btn-primary m-2 py-1">Login</button>
+
+                        <button type="submit" class="btn btn-primary my-3">Login</button>
                     </form>
                     <a href="/auth/register" class="btn btn-link">Register Here</a>
 
+                    <% if (typeof error !== 'undefined' && typeof positive !== "undefined") { %>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <%= error %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <% } else if (typeof error !== 'undefined' && typeof positive === "undefined") { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <%= error %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <% } %>
                 </div>
             </div>
           </div>

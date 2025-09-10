@@ -3,7 +3,6 @@ const ejs = require("ejs");
 const mongoose = require("mongoose");
 const app = express();
 const PORT_NUMBER = 8080;
-
 app.use(express.urlencoded({ extended: true }));
 
 // Routers
