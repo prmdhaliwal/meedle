@@ -67,7 +67,7 @@ router.post("/instructor/assignments-edit", requireLogin, requireRole("teacher")
 
     await assignment.save();
 
-    return res.redirect("/instructor/assignments-edit?msg=Assignment%20added");
+    return res.redirect("/instructor/assignments?msg=Assignment%20added");
   } catch (err) {
     console.error(err);
 
@@ -83,6 +83,21 @@ router.post("/instructor/assignments-edit", requireLogin, requireRole("teacher")
     }
     const assignments = await Assignment.find({}).lean();
     return res.render("assignments-edit", { user: global.currentUser, assignments, error: "Could not create assignment.", created: false });
+  }
+});
+
+router.get("/instructor/assignments", requireLogin, requireRole("teacher"), async (req, res) => {
+  try {
+    // get assignments, could change to get only teacher's created assignments
+    const assignments = await Assignment.find({}).lean();
+
+    console.log("Assignments fetched:", assignments);
+    res.render("assignments", {
+      assignments, 
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while loading the assignments.");
   }
 });
 

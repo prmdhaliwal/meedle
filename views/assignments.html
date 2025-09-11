@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Assignments</title>
+    <link href="/bootstrap.min.css" rel="stylesheet" />
+  </head>
+  <body class="bg-light">
+    <main>
+      <div class="album p-3 mb-5 bg-primary">
+        <h1 class="text-center text-white">Assignments</h1>
+      </div>
+
+      <div class="container" style="max-width: 980px;">
+        <!-- small header with count + manage button -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="text-muted">
+            <%= assignments && assignments.length ? assignments.length : 0 %> assignment<%= (assignments && assignments.length === 1) ? "" : "s" %>
+          </div>
+          <a class="btn btn-primary" href="/instructor/assignments-edit">Manage Assignments</a>
+        </div>
+
+        <!-- Empty state -->
+        <% if (!assignments || assignments.length === 0) { %>
+          <div class="alert alert-secondary">
+            No Assignments.
+          </div>
+        <% } %>
+
+        <!-- Cards -->
+        <div class="row g-3">
+          <% (assignments || []).forEach(function(c){ %>
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                  <h5 class="card-title mb-1"><%= c.title %></h5>
+                  <h5 class="card-title mb-2"><%= c.weighting %></h5>
+                  <p class="card-text text-muted small mb-0"><%= c.body || "" %></p>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
