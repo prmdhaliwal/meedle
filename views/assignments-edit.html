@@ -10,12 +10,10 @@
   <% } %>
 
   <% if (typeof created !== 'undefined' && created) { %>
-    <div class="alert alert-success">Lesson created!</div>
+    <div class="alert alert-success">Assignment created</div>
   <% } %>
 
   <form method="POST" action="/instructor/assignments-edit">
-
-    <form id="assignmentForm">
         <div class="mb-3">
             <label class="form-label">Assignment Title</label>
             <input type="text" class="form-control" required placeholder="Enter assignment title">

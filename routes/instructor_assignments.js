@@ -6,11 +6,13 @@ const Assignment = require("../models/assignments");
 const Lesson = require("../models/lesson");
 const constants = require("constants");
 
+// check for login
 function requireLogin(req, res, next) {
     if (!global.currentUser) return res.redirect("/auth/login");
     next();
   }
 
+  // check to see if user has the instructor role
 function requireRole(role) {
     return (req, res, next) => {
         if (!global.currentUser || global.currentUser.role != role) {
@@ -20,14 +22,17 @@ function requireRole(role) {
     };
 }
 
+// get assignments creation page
 router.get("/instructor/assignments-edit", (req, res) => {
   res.render("assignments-edit");
 });
 
+// get all the assignments
 router.get("/instructor/assignments", requireLogin, requireRole("teacher"), async (req, res) => {
   const assignments = await Assignment.find({ teacher: global.currentUser._id }).lean();
 });
 
+// post new assignment
 router.post("/instructor/assignments-edit", requireLogin, requireRole("teacher"), async (req, res) => {
   try {
     const { title, description, weighting, lessonId } = req.body;
