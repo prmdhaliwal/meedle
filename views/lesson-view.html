@@ -1,0 +1,12 @@
+<%- include('partials/header') %>
+
+<div class="album p-3 mb-5 bg-primary">
+  <h1 class="text-center text-white"><%= lesson.course.code %> — <%= lesson.title %></h1>
+</div>
+
+<div class="container" style="max-width: 800px;">
+  <a href="/courses/<%= lesson.course._id %>/lessons" class="btn btn-link p-0 mb-3">&larr; Back to Lessons</a>
+  <pre class="bg-white p-3 border rounded"><%= lesson.content || "" %></pre>
+</div>
+
+<%- include('partials/footer') %>
