@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>My Classes</title>
+    <link href="/bootstrap.min.css" rel="stylesheet" />
+  </head>
+  <body class="bg-light">
+    <main>
+      <div class="p-4 mb-4 bg-primary text-white text-center">
+        <h1 class="m-0">My Classes</h1>
+      </div>
+
+      <div class="container" style="max-width: 980px;">
+        <p class="text-muted"><strong><%= (classes || []).length %></strong> class(es)</p>
+
+        <% if (!classes || classes.length === 0) { %>
+          <div class="alert alert-info">You're not enrolled in any classes yet.</div>
+        <% } %>
+
+        <div class="row g-3">
+          <% (classes || []).forEach(function(cl){ %>
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                  <h5 class="card-title mb-1"><%= cl.title %></h5>
+                  <p class="text-muted mb-2"><%= cl.term %></p>
+                  <% if (cl.courseCode || cl.courseTitle) { %>
+                    <p class="mb-0 small">
+                      <span class="badge bg-secondary"><%= cl.courseCode %></span>
+                      <span class="text-muted"> — <%= cl.courseTitle %></span>
+                    </p>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
