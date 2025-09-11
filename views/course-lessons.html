@@ -10,9 +10,9 @@
   <% } else { %>
     <div class="list-group">
       <% lessons.forEach(function(lesson){ %>
-        <a href="#" class="list-group-item list-group-item-action">
-          <h5><%= lesson.title %></h5>
-          <p class="mb-1"><%= lesson.content.substring(0, 150) %>...</p>
+        <a href="/lessons/<%= lesson._id %>" class="list-group-item list-group-item-action">
+          <h5 class="mb-1"><%= lesson.title %></h5>
+          <p class="mb-0 text-muted"><%= (lesson.content || "").slice(0,150) %><%= (lesson.content && lesson.content.length > 150) ? "…" : "" %></p>
         </a>
       <% }) %>
     </div>
