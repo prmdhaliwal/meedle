@@ -3,63 +3,65 @@ const express = require("express");
 const router = express.Router();
 require("../models/assignments"); 
 const Assignment = require("../models/assignments");
+const Lesson = require("../models/lesson");
+const constants = require("constants");
 
 function requireLogin(req, res, next) {
     if (!global.currentUser) return res.redirect("/auth/login");
     next();
   }
 
-router.get("/assignments", requireLogin, async (req, res) => {
-  try {
-    const me = global.currentUser;
-    const assignments = await Assignment.find({}).lean();
+function requireRole(role) {
+    return (req, res, next) => {
+        if (!global.currentUser || global.currentUser.role != role) {
+            return res.status(403).send("Teachers only");
+        }
+        next();
+    };
+}
 
-    res.render  ("assignments", { user: me, assignments });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Server error");
-    }
+router.get("/instructor/assignments-edit", (req, res) => {
+  res.render("assignments-edit");
 });
 
-router.get("/assignments-edit", requireLogin, (req, res) => {
-  res.render("/assignments-edit", { user: global.currentUser });
+router.get("/instructor/assignments", requireLogin, requireRole("teacher"), async (req, res) => {
+  const assignments = await Assignment.find({ teacher: global.currentUser._id }).lean();
 });
 
-// sending stuff back to MONGODB
-//new assignment
-router.post("/newAssignment", requireLogin, async (req, res) => {
+router.post("/instructor/assignments-edit", requireLogin, requireRole("teacher"), async (req, res) => {
   try {
-    const me = global.currentUser;
     const { title, description, weighting, lessonId } = req.body;
-    const newAssignment = new Assignment({
-      student: me._id,
+
+    const assignment = new Assignment({
       title,
       description,
       weighting,
       lessonId,
-    });
+    })
 
-    await newAssignment.save();
+      await assignment.save();
+      return res.redirect("/instructor/assignments?msg=Assignment%20added");
+    }
 
-    return res.redirect("/assignments?msg=Assignment%20added");
-  } catch (err) {
-    console.error(err);
-    return res.redirect("/assignments?msg=Error%20adding%20assignment");
+    catch (err) {
+      console.error(err);
+    const assignments = await Assignment.find({}).lean();
+    return res.redirect("/instructor/assignments?msg=Error%20adding%20assignment");
   }
 });
 
 //delete assignment
-router.post("/delete", requireLogin, async (req, res) => {
+router.post("/delete", requireLogin, requireRole("teacher"), async (req, res) => {
   try{
     const me = global.currentUser;
     const {assignmentId} = req.body;
 
     await Assignment.deleteOne({_id: new ObjectId(assignmentId), student: me._id});
 
-    return res.redirect ("/assignments?msg=Assignment%20deleted");
+    return res.redirect ("/instructor/assignments?msg=Assignment%20deleted");
   } catch (err) {
     console.error(err);
-    return res.redirect("/assignments?msg=Error%20deleting%20assignment");
+    return res.redirect("/instructor/assignments?msg=Error%20deleting%20assignment");
 
   }
 });

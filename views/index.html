@@ -16,6 +16,9 @@
         <% if (user && user.role == "teacher") { %>
             <a href="/instructor/lessons/new" class="btn btn-success">Create Lesson</a>
         <% } %>
+        <% if (user && user.role == "teacher") { %>
+            <a href="/instructor/assignments-edit" class="btn btn-success">Manage Assignments</a>
+        <% } %>
     </div>
 
     

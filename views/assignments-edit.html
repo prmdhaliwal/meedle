@@ -1,0 +1,39 @@
+<%- include('partials/header') %>
+
+<div class="album p-3 mb-5 bg-primary">
+  <h1 class="text-center text-white">Assignments</h1>
+</div>
+
+<div class="container" style="max-width: 800px;">
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-danger"><%= error %></div>
+  <% } %>
+
+  <% if (typeof created !== 'undefined' && created) { %>
+    <div class="alert alert-success">Lesson created!</div>
+  <% } %>
+
+  <form method="POST" action="/instructor/assignments-edit">
+
+    <form id="assignmentForm">
+        <div class="mb-3">
+            <label class="form-label">Assignment Title</label>
+            <input type="text" class="form-control" required placeholder="Enter assignment title">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea type="text" class="form-control" rows="8" required placeholder="Enter assignment description"></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Weighting</label>
+            <textarea class="form-control" required placeholder="Enter assignment weighting"></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Lesson ID</label>
+            <input type="text" class="form-control" required placeholder="Enter Lesson ID">
+        </div>
+        <button type="submit" class="btn btn-primary">Add Assignment</button>
+    </form>
+</div>
+
+<%- include('partials/footer') %>
