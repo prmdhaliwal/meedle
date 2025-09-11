@@ -5,6 +5,7 @@ const app = express();
 const PORT_NUMBER = 8080;
 const studentCourses = require("./routes/studentcourses")
 const studentClasses = require("./routes/studentclasses.js")
+const { ClassEnrollment } = require("./models/class"); 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use("/student", studentCourses);
@@ -46,12 +47,28 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get("/", (req, res) => {
-    if (currentUser) {
-        return res.render("index"); 
-    } else {
-        return res.redirect("/auth/login");
-    }
+app.get("/", async (req, res) => {
+    if (!currentUser) return res.redirect("/auth/login");
+   
+    const me = currentUser;
+
+    let myClasses = [];
+  try {
+    const enrolls = await ClassEnrollment.find({ student: me._id })
+      .populate({ path: "classroom", populate: { path: "course" } })
+      .lean();
+
+    myClasses = enrolls.map(e => ({
+      title: e.classroom?.title || "(Untitled)",
+      term:  e.classroom?.term  || "",
+      code:  e.classroom?.course?.code || ""
+    }));
+  } catch (err) {
+    console.error("[/] load classes error:", err.message);
+  }
+
+  return res.render("index", { myClasses});
+
 });   
 
 app.use("/auth", authRoutes); 

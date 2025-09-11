@@ -12,7 +12,32 @@
     <div class="mt-3"> 
         <a href="/student/courses" class="btn btn-primary me-2">My Courses</a> 
         <a href="/student/manage-enrollments" class="btn btn-outline-primary">Manage Enrollments</a>
-        
+
+        <% if (user && user.role === "student") { %>
+            <section style="margin-top:16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <h3 style="margin:0;">My Classes</h3>
+                    <a href="/student/classes" class="btn btn-link">View all</a>
+                </div>
+
+                <% if (!myClasses || myClasses.length === 0) { %>
+                    <div style="color:#6b7280;">You're not enrolled in any classes yet.</div>
+                <% } else { %>
+                    <ul style="list-style:none;padding:0;margin:0;display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));">
+                        <% myClasses.slice(0,4).forEach(function(c){ %>
+                            <li style="background:#fff;border-radius:12px;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
+                                <div style="font-size:12px;background:#e5e7eb;display:inline-block;padding:2px 8px;border-radius:999px;">
+                                    <%= c.code || "CLASS" %>
+                                </div>
+                                <div style="margin:8px 0 2px;font-weight:600;"><%= c.title %></div>
+                                <div style="color:#6b7280;font-size:13px;"><%= c.term %></div>
+                            </li>
+                        <% }) %>
+                    </ul>
+                <% } %>
+            </section>
+        <% } %>
+
         <% if (user && user.role == "teacher") { %>
             <a href="/instructor/lessons/new" class="btn btn-success">Create Lesson</a>
         <% } %>
