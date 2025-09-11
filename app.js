@@ -10,6 +10,9 @@ app.use("/student", studentCourses);
 
 
 // Routers
+const authRouter = require("./routes/auth");
+const studentRouter = require("./routes/student");
+const teacherRouter = require("./routes/teacher");
 const authRoutes = require("./routes/auth");
 const lessonRoutes = require("./routes/lessons");
 
@@ -24,6 +27,9 @@ app.set("view engine", "html");
 
 // Configure Mongoose
 const URL = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/fit2101_lms";
+// const URL = "mongodb://127.0.0.1:27017/fit2101_lms";
+const URL = "mongodb://127.0.0.1:27017/fit2101_lms"
+
 async function connectDB(url){
     await mongoose.connect(url);
     return("Connected successfully");
@@ -47,7 +53,11 @@ app.use((req, res, next) => {
 
 app.get("/", (req, res) => {
     if (currentUser) {
-        return res.render("index"); 
+        if (currentUser.role === "teacher") {
+            return res.redirect("/teacher");
+        } else { //student 
+            return res.redirect("/student");
+        }
     } else {
         return res.redirect("/auth/login");
     }
@@ -55,6 +65,10 @@ app.get("/", (req, res) => {
 
 app.use("/auth", authRoutes); 
 app.use("/", lessonRoutes)
+app.use("/student", studentRouter);
+app.use("/teacher", teacherRouter);
+app.use("/auth", authRouter); 
+
 
 app.listen(PORT_NUMBER, function(){
     console.log("Listening at http://localhost:" + PORT_NUMBER);
