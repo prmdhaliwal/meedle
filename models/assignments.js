@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const AssignmentSchema = new mongoose.Schema({
     title: { type: String, required: true},
-    description: { type: String, default: "" },
+    body: { type: String, required: true },
     weighting: { type: Number, required: true, min: 0, max: 100 },
     lessonId: { type: String, required: true }
 }, { timestamps: true });

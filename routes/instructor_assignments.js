@@ -35,41 +35,49 @@ router.get("/instructor/assignments", requireLogin, requireRole("teacher"), asyn
 // post new assignment
 router.post("/instructor/assignments-edit", requireLogin, requireRole("teacher"), async (req, res) => {
   try {
-    const { title, description, weighting, lessonId } = req.body;
+    const { title, body, weighting, lessonId } = req.body;
+
+    // Validate required fields
+    if (!title || !body || !weighting || !lessonId) {
+      return res.status(400).send('Title, weighting, and lessonId are required.');
+    }
 
     const assignment = new Assignment({
       title,
-      description,
+      body,
       weighting,
       lessonId,
-    })
+      teacher: global.currentUser._id,
+    });
+
 
       await assignment.save();
+      res.status(201).send('Assignment created successfully');
       return res.redirect("/instructor/assignments?msg=Assignment%20added");
     }
 
     catch (err) {
       console.error(err);
     const assignments = await Assignment.find({}).lean();
-    return res.redirect("/instructor/assignments?msg=Error%20adding%20assignment");
+    return res.render("assignments-edit", { user: global.currentUser, assignments, error: "Could not create assignment.", created: false });
   }
 });
 
-//delete assignment
-router.post("/delete", requireLogin, requireRole("teacher"), async (req, res) => {
-  try{
-    const me = global.currentUser;
-    const {assignmentId} = req.body;
+//delete assignment (WIP)
+// router.post("/delete", requireLogin, requireRole("teacher"), async (req, res) => {
+//   try{
+//     const me = global.currentUser;
+//     const {assignmentId} = req.body;
 
-    await Assignment.deleteOne({_id: new ObjectId(assignmentId), student: me._id});
+//     await Assignment.deleteOne({_id: new ObjectId(assignmentId), student: me._id});
 
-    return res.redirect ("/instructor/assignments?msg=Assignment%20deleted");
-  } catch (err) {
-    console.error(err);
-    return res.redirect("/instructor/assignments?msg=Error%20deleting%20assignment");
+//     return res.redirect ("/instructor/assignments?msg=Assignment%20deleted");
+//   } catch (err) {
+//     console.error(err);
+//     return res.redirect("/instructor/assignments?msg=Error%20deleting%20assignment");
 
-  }
-});
+//   }
+// });
 
 
 module.exports = router;
