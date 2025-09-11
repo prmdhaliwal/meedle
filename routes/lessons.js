@@ -1,7 +1,7 @@
 // routes/lessons.js
 const express = require("express");
 const router = express.Router();
-
+const User = require("../models/User"); 
 const Course = require("../models/course");
 const Lesson = require("../models/lesson");
 
@@ -83,6 +83,23 @@ router.get("/lessons/:id", requireLogin, async (req, res) => {
     console.error(err);
     res.status(500).send("Server error");
   }
+});
+
+// View all students
+router.get("/instructor/students", requireLogin, requireRole("teacher"), async (req, res) => {
+    try {
+      // TODO change the schemas so the students only have role or isAdmin, not both
+        const students = await User.find({ 
+          $or: [
+            { role: "student" },
+            { isAdmin: false }
+          ]
+        }).lean();
+        res.render("students-list", {students });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server error");
+    }
 });
 
 module.exports = router;
