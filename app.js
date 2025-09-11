@@ -14,7 +14,7 @@ app.use("/student", studentClasses);
 // Routers
 const authRoutes = require("./routes/auth");
 const lessonRoutes = require("./routes/lessons");
-const assignmentRoutes = require("./routes/assignments");
+const assignmentRoutes = require("./routes/instructor_assignments");
 
 //References to the static assets
 app.use(express.static("node_modules/bootstrap/dist/css"));

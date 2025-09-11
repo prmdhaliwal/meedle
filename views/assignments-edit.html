@@ -14,6 +14,7 @@
   <% } %>
 
   <form method="POST" action="/instructor/assignments-edit">
+        <!-- assignment form -->
         <div class="mb-3">
             <label class="form-label">Assignment Title</label>
             <input type="text" name="title" class="form-control" required placeholder="Enter assignment title">
@@ -32,6 +33,19 @@
         </div>
         <button type="submit" class="btn btn-primary">Add Assignment</button>
     </form>
+
+    <!-- to display assignments (currently doesnt work) -->
+    <br><br><br><br>
+    <h2>Existing Assignments</h2>
+    <ul>
+      <% if (assignments.length > 0) { %>
+        <% assignments.forEach(assignment => { %>
+          <li><%= assignment.title %> - <%= assignment.lessonId %></li>
+        <% }) %>
+      <% } else { %>
+        <li>No assignments found.</li>
+      <% } %>
+    </ul>
 </div>
 
 <%- include('partials/footer') %>

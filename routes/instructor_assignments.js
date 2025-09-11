@@ -23,13 +23,20 @@ function requireRole(role) {
 }
 
 // get assignments creation page
-router.get("/instructor/assignments-edit", (req, res) => {
-  res.render("assignments-edit");
-});
+router.get("/instructor/assignments-edit", requireLogin, requireRole("teacher"), async (req, res) => {
+  try {
+    // get assignments 
+    const assignments = await Assignment.find({}).lean();
 
-// get all the assignments
-router.get("/instructor/assignments", requireLogin, requireRole("teacher"), async (req, res) => {
-  const assignments = await Assignment.find({ teacher: global.currentUser._id }).lean();
+    res.render("assignments-edit", {
+      user: global.currentUser,
+      assignments, 
+      created: false, 
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while loading the assignments.");
+  }
 });
 
 // post new assignment
@@ -37,11 +44,19 @@ router.post("/instructor/assignments-edit", requireLogin, requireRole("teacher")
   try {
     const { title, body, weighting, lessonId } = req.body;
 
-    // Validate required fields
+    // validate input
     if (!title || !body || !weighting || !lessonId) {
-      return res.status(400).send('Title, weighting, and lessonId are required.');
+      const assignments = await Assignment.find({ teacher: global.currentUser._id }).lean();
+      return res.render("assignments-edit", {
+        user: global.currentUser,
+        assignments,
+        error: "All fields are required.",
+        created: false,
+      });
     }
 
+    // create a new assignment, lessonID needs to be unique.
+    // in the future, will change this to be linked directly to a lesson
     const assignment = new Assignment({
       title,
       body,
@@ -50,14 +65,22 @@ router.post("/instructor/assignments-edit", requireLogin, requireRole("teacher")
       teacher: global.currentUser._id,
     });
 
+    await assignment.save();
 
-      await assignment.save();
-      res.status(201).send('Assignment created successfully');
-      return res.redirect("/instructor/assignments?msg=Assignment%20added");
+    return res.redirect("/instructor/assignments-edit?msg=Assignment%20added");
+  } catch (err) {
+    console.error(err);
+
+    // check for duplicate key error (MongoDB error code 11000)
+    if (err.code === 11000) {
+      const assignments = await Assignment.find({ teacher: global.currentUser._id }).lean();
+      return res.render("assignments-edit", {
+        user: global.currentUser,
+        assignments,
+        error: "Duplicate entry: An assignment with the same title or lesson ID already exists.",
+        created: false,
+      });
     }
-
-    catch (err) {
-      console.error(err);
     const assignments = await Assignment.find({}).lean();
     return res.render("assignments-edit", { user: global.currentUser, assignments, error: "Could not create assignment.", created: false });
   }
