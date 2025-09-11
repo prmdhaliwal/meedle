@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Page</title>
+    <link href="/bootstrap.min.css" rel="stylesheet" />
+  </head>
+
+  <body class="bg-light">
+    <main>
+
+      <div class="album p-3 mb-5 bg-primary">
+        <h1 class="text-center text-white">Login Page</h1>
+      </div>
+      
+      <div>
+        <div class="container mb-5 d-flex justify-content-center">
+          <div class="col-4">
+
+            <!-- Card -->
+            <div class="card shadow">
+                <div class="card-body">
+
+                    <!-- FORM -->
+                    <form action="/auth/login" method="POST">
+                        <div>
+                            <label for="email" class="form-label">Email:</label>
+                            <input type="email" id="email" name="email" class="form-control" required />
+                        </div>
+
+                        <div>
+                            <label for="password" class="form-label">Password:</label>
+                            <input type="password" id="password" name="password" class="form-control" required />
+                        </div>
+
+
+                        <button type="submit" class="btn btn-primary my-3">Login</button>
+                    </form>
+                    <a href="/auth/register" class="btn btn-link">Register Here</a>
+
+                    <% if (typeof error !== 'undefined' && typeof positive !== "undefined") { %>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <%= error %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <% } else if (typeof error !== 'undefined' && typeof positive === "undefined") { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <%= error %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
+
+<%- include('partials/footer') %>
