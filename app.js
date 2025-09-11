@@ -4,10 +4,11 @@ const mongoose = require("mongoose");
 const app = express();
 const PORT_NUMBER = 8080;
 const studentCourses = require("./routes/studentcourses")
+const studentClasses = require("./routes/studentclasses.js")
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use("/student", studentCourses);
-
+app.use("/student", studentClasses);
 
 // Routers
 const authRoutes = require("./routes/auth");
