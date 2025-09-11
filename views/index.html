@@ -9,6 +9,15 @@
 </head>
 <body>
     <h1> Welcome back, <%= user.name%> </h1>
+    <div class="mt-3"> 
+        <a href="/student/courses" class="btn btn-primary me-2">My Courses</a> 
+        <a href="/student/manage-enrollments" class="btn btn-outline-primary">Manage Enrollments</a>
+        
+        <% if (user && user.role == "teacher") { %>
+            <a href="/instructor/lessons/new" class="btn btn-success">Create Lesson</a>
+        <% } %>
+    </div>
+
     
 </body>
 </html>

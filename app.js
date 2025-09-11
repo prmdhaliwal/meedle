@@ -3,12 +3,18 @@ const ejs = require("ejs");
 const mongoose = require("mongoose");
 const app = express();
 const PORT_NUMBER = 8080;
+const studentCourses = require("./routes/studentcourses")
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use("/student", studentCourses);
+
 
 // Routers
 const authRouter = require("./routes/auth");
 const studentRouter = require("./routes/student");
 const teacherRouter = require("./routes/teacher");
+const authRoutes = require("./routes/auth");
+const lessonRoutes = require("./routes/lessons");
 
 //References to the static assets
 app.use(express.static("node_modules/bootstrap/dist/css"));
@@ -20,6 +26,7 @@ app.engine("html", ejs.renderFile);
 app.set("view engine", "html");
 
 // Configure Mongoose
+const URL = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/fit2101_lms";
 // const URL = "mongodb://127.0.0.1:27017/fit2101_lms";
 const URL = "mongodb://127.0.0.1:27017/fit2101_lms"
 
@@ -56,6 +63,8 @@ app.get("/", (req, res) => {
     }
 });   
 
+app.use("/auth", authRoutes); 
+app.use("/", lessonRoutes)
 app.use("/student", studentRouter);
 app.use("/teacher", teacherRouter);
 app.use("/auth", authRouter); 
