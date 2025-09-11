@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { Classroom, ClassEnrollment } = require("../models/class");
+const { ClassEnrollment } = require("../models/class");
 
 
 function requireLogin(req, res, next) {
@@ -11,16 +11,16 @@ function requireLogin(req, res, next) {
 //show all the classes that a student is enrolled in
 router.get("/classes", requireLogin, async (req, res) => {
   try {
-    const me = req.user;
+    const me = global.currentUser;
 
-    // Find this student's enrollments and populate class (and course, if present)
+    // find the students classes and fill them out
     const enrolls = await ClassEnrollment
       .find({ student: me._id })
-      .populate({ path: "class", populate: { path: "course", model: "Course" } })
+      .populate({ path: "studentclasses", populate: { path: "course", model: "Course" } })
       .lean();
 
     const classes = enrolls.map(e => {
-      const c = e.class;
+      const c = e.studentclasses;
       const course = c?.course || {};
       return {
         id: c?._id?.toString() || "",
