@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Assignment Page</title>
+        <title>Assignments</title>
         <link rel="stylesheet" href="styles.css">
         <script src="script.js" defer></script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,19 +10,22 @@
     </head>
 
     <body>
-        <header>
+        <header> <!-- header at the top, remove when integrating -->
             <h1>Assignments</h1>
         </header>
         <main>
-            <section id="assignments">
+            <section id="assignments"> 
                 <h2>Create New Assignments</h2>
+                <!-- create new assignment button-->
                 <button type="button" id="addAssignmentBtn">Add New Assignment</button>
                 
+                <!-- this is for the created assignments -->
                 <div class="assignment-list" id="assignmentList"></div>
             </section>
             
             <!-- I used Deepseek to create a HTML form template, of which I then edited myself to meet the assignment requirements. -->
             <!-- Assignment Form Modal -->
+             <!-- Simple html form to get the 4 required things: title, description, weighting and lesson id -->
             <div class="modal" id="assignmentModal">
                 <div class="modal-content">
                     <div class="modal-header">

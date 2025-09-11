@@ -1,41 +1,35 @@
-const MongoClient = require('mongodb').MongoClient;
-const uri = "mongodb://127.0.0.1:27017/fit2101_lms";
-const dbName = "test";
-const collectionName = "assignments";
-
-MongoClient.connect(uri, function(err, client) {
-    if (err) throw err;
-    const db = client.db(dbName);
-    const collection = db.collection(collectionName);
-
-
-    // I used Deepseek to explain to me how to create a JS script to store html form information and display it. I then used some examples and edited it to meet my needs.
     document.addEventListener('DOMContentLoaded', function() {
+        // get the information from the form
         const addAssignmentBtn = document.getElementById('addAssignmentBtn');
         const assignmentModal = document.getElementById('assignmentModal');
         const closeModal = document.getElementById('closeModal');
         const assignmentForm = document.getElementById('assignmentForm');
         const assignmentList = document.getElementById('assignmentList');
         
+        // this array will be replaced with the database, was just used temporarily to test stuff
         let assignments = [];
-        
+
+        // to initially open the modal
         addAssignmentBtn.addEventListener('click', function() {
             assignmentModal.style.display = 'flex';
         });
         
+        // to close the modal
         closeModal.addEventListener('click', function() {
             assignmentModal.style.display = 'none';
         });
 
+        // to submit the form
         assignmentForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // form values
             const title = document.getElementById('title').value;
             const description = document.getElementById('description').value;
             const weighting = document.getElementById('weighting').value;
             const lessonId = document.getElementById('lessonId').value;
 
-          
+            // assignment object, will be replaced by the schema stuff
             const assignment = {
                 id: Date.now(), 
                 title,
@@ -44,36 +38,34 @@ MongoClient.connect(uri, function(err, client) {
                 lessonId
             };
             
-        
-            //assignments.push(assignment); // This will need to connect to database
-            // before renderAssignments, need method to get assignments from database
-            collection.insertOne(assignment, function(err, res) {
-                if (err) throw err;
-                console.log("doc inserted"); 
-            });
+            // this pushes to the temp array for testing
+            // instead of this, will need to have a method to create a new doc and send to database
+            assignments.push(assignment);
 
+            // this gets the assignments from the database and renders them
             renderAssignments();
+
+            // reset the form
             assignmentForm.reset();
             assignmentModal.style.display = 'none';
             
+            // alert feedback, can remove later
             alert('Assignment added successfully!');
         });
         
+        // function to render assignments, will need to get from database instead of the temp array
         function renderAssignments() {
             assignmentList.innerHTML = '';
-            
-            collection.find({}).toArray(function(err, assignments) {
-                if (err) throw err;
-            });
 
-
+            // checks if no assignments and displays message
             if (assignments.length === 0) {
                 assignmentList.innerHTML = '<p>No assignments yet. Click "Add New Assignment" to create your first assignment.</p>';
                 return;
             }
             
-            
-            
+            // for each assignment, create html and then append to the html
+            // basically creates html stuff for each assignment
+            // needs to be changed to get from database instead of temporary array
             assignments.forEach(assignment => {
                 const assignmentElement = document.createElement('div');
                 assignmentElement.classList.add('assignment-item');
@@ -92,4 +84,4 @@ MongoClient.connect(uri, function(err, client) {
         
         renderAssignments();
     });
-});
+// });
