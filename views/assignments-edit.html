@@ -1,5 +1,4 @@
 <%- include('partials/header') %>
-
 <div class="album p-3 mb-5 bg-primary">
   <h1 class="text-center text-white">Assignments</h1>
 </div>
@@ -12,7 +11,7 @@
   <% if (typeof created !== 'undefined' && created) { %>
     <div class="alert alert-success">Assignment created</div>
   <% } %>
-
+  
   <form method="POST" action="/instructor/assignments-edit">
         <!-- assignment form -->
         <div class="mb-3">
@@ -31,7 +30,9 @@
             <label class="form-label">Lesson ID</label>
             <input type="text" name="lessonId" class="form-control" required placeholder="Enter Lesson ID">
         </div>
+        <a href="/instructor/assignments" class="btn btn-secondary ms-2">Go Back</a>
         <button type="submit" class="btn btn-primary">Add Assignment</button>
+        
     </form>
 
     <!-- to display assignments (currently doesnt work) -->

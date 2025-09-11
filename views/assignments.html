@@ -31,11 +31,12 @@
         <!-- Cards -->
         <div class="row g-3">
           <% (assignments || []).forEach(function(c){ %>
-            <div class="col-12 col-md-6 col-lg-4">
+            <div class="col-12">
               <div class="card h-100 shadow-sm">
                 <div class="card-body">
                   <h5 class="card-title mb-1"><%= c.title %></h5>
-                  <h5 class="card-title mb-2"><%= c.weighting %></h5>
+                  <h6 class="card-subtitle mb-1">Weighting: <%= c.weighting %></h5>
+                  <h6 class="card-subtitle mb-1">Lesson ID: <%= c.lessonId %></h5>
                   <p class="card-text text-muted small mb-0"><%= c.body || "" %></p>
                 </div>
               </div>
