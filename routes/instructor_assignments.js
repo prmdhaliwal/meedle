@@ -1,0 +1,106 @@
+// routes/assignments.js
+const express = require("express");
+const router = express.Router();
+require("../models/assignments"); 
+const Assignment = require("../models/assignments");
+const Lesson = require("../models/lesson");
+const constants = require("constants");
+
+// check for login
+function requireLogin(req, res, next) {
+    if (!global.currentUser) return res.redirect("/auth/login");
+    next();
+  }
+
+  // check to see if user has the instructor role
+function requireRole(role) {
+    return (req, res, next) => {
+        if (!global.currentUser || global.currentUser.role != role) {
+            return res.status(403).send("Teachers only");
+        }
+        next();
+    };
+}
+
+// get assignments creation page
+router.get("/instructor/assignments-edit", requireLogin, requireRole("teacher"), async (req, res) => {
+  try {
+    // get assignments 
+    const assignments = await Assignment.find({}).lean();
+
+    res.render("assignments-edit", {
+      user: global.currentUser,
+      assignments, 
+      created: false, 
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while loading the assignments.");
+  }
+});
+
+// post new assignment
+router.post("/instructor/assignments-edit", requireLogin, requireRole("teacher"), async (req, res) => {
+  try {
+    const { title, body, weighting, lessonId } = req.body;
+
+    // validate input
+    if (!title || !body || !weighting || !lessonId) {
+      const assignments = await Assignment.find({ teacher: global.currentUser._id }).lean();
+      return res.render("assignments-edit", {
+        user: global.currentUser,
+        assignments,
+        error: "All fields are required.",
+        created: false,
+      });
+    }
+
+    // create a new assignment, lessonID needs to be unique.
+    // in the future, will change this to be linked directly to a lesson
+    const assignment = new Assignment({
+      title,
+      body,
+      weighting,
+      lessonId,
+      teacher: global.currentUser._id,
+    });
+
+    await assignment.save();
+
+    return res.redirect("/instructor/assignments-edit?msg=Assignment%20added");
+  } catch (err) {
+    console.error(err);
+
+    // check for duplicate key error (MongoDB error code 11000)
+    if (err.code === 11000) {
+      const assignments = await Assignment.find({ teacher: global.currentUser._id }).lean();
+      return res.render("assignments-edit", {
+        user: global.currentUser,
+        assignments,
+        error: "Duplicate entry: An assignment with the same title or lesson ID already exists.",
+        created: false,
+      });
+    }
+    const assignments = await Assignment.find({}).lean();
+    return res.render("assignments-edit", { user: global.currentUser, assignments, error: "Could not create assignment.", created: false });
+  }
+});
+
+//delete assignment (WIP)
+// router.post("/delete", requireLogin, requireRole("teacher"), async (req, res) => {
+//   try{
+//     const me = global.currentUser;
+//     const {assignmentId} = req.body;
+
+//     await Assignment.deleteOne({_id: new ObjectId(assignmentId), student: me._id});
+
+//     return res.redirect ("/instructor/assignments?msg=Assignment%20deleted");
+//   } catch (err) {
+//     console.error(err);
+//     return res.redirect("/instructor/assignments?msg=Error%20deleting%20assignment");
+
+//   }
+// });
+
+
+module.exports = router;
