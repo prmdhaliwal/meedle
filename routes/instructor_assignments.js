@@ -27,11 +27,14 @@ router.get("/instructor/assignments-edit", requireLogin, requireRole("teacher"),
   try {
     // get assignments 
     const assignments = await Assignment.find({}).lean();
+    const lessons = await Lesson.find({}).lean();
 
     res.render("assignments-edit", {
       user: global.currentUser,
       assignments, 
       created: false, 
+      lessons,
+      courses,
     });
   } catch (err) {
     console.error(err);
@@ -90,6 +93,7 @@ router.get("/instructor/assignments", requireLogin, requireRole("teacher"), asyn
   try {
     // get assignments, could change to get only teacher's created assignments
     const assignments = await Assignment.find({}).lean();
+    const lessons = await Lesson.find({}).lean();
 
     console.log("Assignments fetched:", assignments);
     res.render("assignments", {

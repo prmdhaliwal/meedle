@@ -27,26 +27,18 @@
             <textarea class="form-control" name="weighting" required placeholder="Enter assignment weighting"></textarea>
         </div>
         <div class="mb-3">
-            <label class="form-label">Lesson ID</label>
-            <input type="text" name="lessonId" class="form-control" required placeholder="Enter Lesson ID">
+            <label class="form-label">Lesson</label>
+            <select class="form-select" name="LessonId" required>
+              <option value="" disabled selected>Select a Lesson</option>
+              <% (lessons || []).forEach(function(c){ %>
+                <option value="<%= c._id %>"><%= c.course %> — <%= c.title %></option>
+              <% }) %>
+            </select>
         </div>
         <a href="/instructor/assignments" class="btn btn-secondary ms-2">Go Back</a>
         <button type="submit" class="btn btn-primary">Add Assignment</button>
         
     </form>
-
-    <!-- to display assignments (currently doesnt work) -->
-    <!-- <br><br><br><br>
-    <h2>Existing Assignments</h2>
-    <ul>
-      <% if (assignments.length > 0) { %>
-        <% assignments.forEach(assignment => { %>
-          <li><%= assignment.title %> - <%= assignment.lessonId %></li>
-        <% }) %>
-      <% } else { %>
-        <li>No assignments found.</li>
-      <% } %>
-    </ul> -->
 </div>
 
 <%- include('partials/footer') %>
