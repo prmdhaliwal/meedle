@@ -16,6 +16,7 @@
             <th>Name</th>
             <th>Email</th>
             <th>Courses</th>
+            <th></th>
             </tr>
         </thead>
         <tbody>
@@ -29,6 +30,7 @@
                         <%= course %><%= i < student.courses.length - 1 ? ", " : "" %>
                     <% }) %>
                 </td>
+                <td><a href="/auth/deleteStudent/<%= student._id %>" class="btn btn-danger btn-sm">Delete</a></td>
             </tr>
             <% }) %>
         </tbody>

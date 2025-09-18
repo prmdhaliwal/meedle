@@ -128,6 +128,27 @@ router.get("/logout", function(req, res) {
   res.redirect("/auth/login");
 });
 
+// Delete student button 
+router.get("/deleteStudent/:id", async (req, res) => {
+  try {
+    const studentId = req.params.id;
+    console.log(studentId);
+    
+
+    // Find the student by ID and delete them
+    const student = await User.findByIdAndDelete(studentId);
+
+    if (!student) {
+      return res.status(404).send("Student not found");
+    }
+
+    res.redirect("/auth/deleteStudent"); // Redirect to the students list page after deletion
+  } catch (error) {
+    console.error("Error deleting student:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 module.exports = router;
 
 
