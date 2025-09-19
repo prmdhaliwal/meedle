@@ -34,7 +34,6 @@ router.get("/instructor/assignments-edit", requireLogin, requireRole("teacher"),
       assignments, 
       created: false, 
       lessons,
-      courses,
     });
   } catch (err) {
     console.error(err);
