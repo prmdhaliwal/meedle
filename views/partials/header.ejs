@@ -13,20 +13,27 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Navigation bar that appears on all pages -->
-    <nav class="navbar navbar-dark bg-primary mb-4">
-        <div class="container">
-            <!-- Link back to home page -->
-            <a class="navbar-brand" href="/">Home Page</a>
-            <!-- Link to change information page -->
-            <a class="navbar-brand" href="/auth/edit-details">Change Information</a>
-
-            <!-- Link to logout -->
-            <a class="navbar-brand" href="/auth/logout">Logout</a>
-
-            
-        </div>
-    </nav>
+        <!-- Responsive Navigation bar -->
+        <nav class="navbar navbar-dark navbar-expand-lg bg-primary mb-4">
+            <div class="container">
+                <a class="navbar-brand" href="/">Home Page</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/auth/edit-details">Change Information</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/auth/logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
     
     <!-- Opening container div - content will go here -->
     <div class="container">
+    <!-- Bootstrap JS for responsive navbar (dropdown) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
