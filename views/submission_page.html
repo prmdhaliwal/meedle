@@ -9,40 +9,29 @@
     textarea { width: 95%; height: 150px; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; resize: vertical; display: block; margin: 0 auto; }
     button { margin-top: 12px; background-color: #007bff; color: white; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; }
     button:hover { background-color: #0056b3; }
-    #successMsg { color: green; margin-top: 10px; display: none; }
+    .alert { margin-top: 12px; padding: 10px; border-radius: 6px; }
+    .alert-success { background: #d1fae5; color: #065f46; }
+    .alert-error { background: #fee2e2; color: #991b1b; }
   </style>
 </head>
 <body>
   <h1 style="color:#007bff;">Assignment Submission</h1>
   <div class="form-box">
-    <form id="submissionPage" method="POST">
-      <input type="hidden" id="assignmentId" name="assignmentId" />
+    <!-- This form posts to /submission -->
+    <form id="submissionPage" method="POST" action="/submission">
+      <input type="hidden" id="assignmentId" name="assignmentId" value="<%= assignmentId || '' %>"/>
       <label for="answer">Type your answer:</label>
       <textarea id="answer" name="answer" placeholder="Enter your answer here..."></textarea>
       <button type="submit">Submit</button>
     </form>
-    <div id="successMsg">Assignment submitted successfully</div>
+
+    <% if (typeof created !== 'undefined' && created) { %>
+      <div class="alert alert-success">✅ Assignment submitted successfully.</div>
+    <% } %>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-error"><%= error %></div>
+    <% } %>
   </div>
-
-  <script>
-    const parts = window.location.pathname.split('/');
-    const assignmentId = parts[2] || "";
-    document.getElementById("assignmentId").value = assignmentId;
-
-    const form = document.getElementById("submissionPage");
-    const input = document.getElementById("answer");
-    const successMsg = document.getElementById("successMsg");
-
-    form.addEventListener("submit", function(e) {
-      e.preventDefault();
-      successMsg.style.display = "none";
-      if (input.value.trim() === "") {
-        alert("No answer provided. Please type your answer.");
-      } else {
-        successMsg.style.display = "block";
-        console.log("Submitting for assignmentId:", assignmentId);
-      }
-    });
-  </script>
 </body>
 </html>
