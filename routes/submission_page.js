@@ -9,11 +9,13 @@ function requireLogin(req, res, next) {
 }
 
 router.get('/new', requireLogin, (req, res) => {
-    res.render('basic_submission_page/new',{
-        Classroom:"",
-        assignments:"",
-        content:""
-    });
+  const { assignmentId } = req.query;
+  res.render('submission_page', { 
+    Classroom: "",
+    assignments: "",
+    content: "",
+    assignmentId: assignmentId || ""
+  });
 });
 
-router.post
+module.exports = router;

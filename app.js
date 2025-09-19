@@ -15,11 +15,14 @@ app.use("/student", studentClasses);
 const authRoutes = require("./routes/auth");
 const lessonRoutes = require("./routes/lessons");
 const assignmentRoutes = require("./routes/instructor_assignments");
+const submissionRouter = require('./routes/submission_page');
 
 //References to the static assets
 app.use(express.static("node_modules/bootstrap/dist/css"));
 app.use(express.static("images")); //This one means statics are in images folder. So paths will just be /porsche.jpg for example rather than absolute paths
 // app.use(express.static("scripts"));
+app.use('/submission', submissionRouter);
+
 
 // Configure EJS
 app.engine("html", ejs.renderFile);
