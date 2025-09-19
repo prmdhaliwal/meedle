@@ -104,21 +104,26 @@ router.get("/instructor/assignments", requireLogin, requireRole("teacher"), asyn
   }
 });
 
-//delete assignment (WIP)
-// router.post("/delete", requireLogin, requireRole("teacher"), async (req, res) => {
-//   try{
-//     const me = global.currentUser;
-//     const {assignmentId} = req.body;
+const { ObjectId } = require("mongodb");
 
-//     await Assignment.deleteOne({_id: new ObjectId(assignmentId), student: me._id});
+// delete assignment
+router.post("/instructor/assignments-delete/:id", requireLogin, requireRole("teacher"), async (req, res) => {
+  try {
+    const me = global.currentUser;
+    const assignmentId = req.params.id;
 
-//     return res.redirect ("/instructor/assignments?msg=Assignment%20deleted");
-//   } catch (err) {
-//     console.error(err);
-//     return res.redirect("/instructor/assignments?msg=Error%20deleting%20assignment");
+    // Only delete if the teacher owns it
+    await Assignment.deleteOne({
+      _id: new ObjectId(assignmentId),
+      teacher: me._id
+    });
 
-//   }
-// });
+    return res.redirect("/instructor/assignments?msg=Assignment%20deleted");
+  } catch (err) {
+    console.error(err);
+    return res.redirect("/instructor/assignments?msg=Error%20deleting%20assignment");
+  }
+});
 
 
 module.exports = router;

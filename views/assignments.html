@@ -39,6 +39,15 @@
                   <h6 class="card-subtitle mb-1">Weighting: <%= c.weighting %></h5>
                   <h6 class="card-subtitle mb-1">Lesson ID: <%= c.lessonId %></h5>
                   <p class="card-text text-muted small mb-0"><%= c.body || "" %></p>
+
+                  <div class="d-flex justify-content-end gap-2">
+                    <a href="/instructor/assignments-edit/<%= c._id %>" class="btn btn-sm btn-outline-primary">Edit</a>
+                    <form method="POST" action="/instructor/assignments-delete/<%= c._id %>" 
+                        onsubmit="return confirm('Are you sure?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                  </form>
+                  </div>
+
                 </div>
               </div>
             </div>
