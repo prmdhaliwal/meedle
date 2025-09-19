@@ -125,5 +125,69 @@ router.post("/instructor/assignments-delete/:id", requireLogin, requireRole("tea
   }
 });
 
+// GET route to show edit form
+router.get("/instructor/assignments-edit/:id", requireLogin, requireRole("teacher"), async (req, res) => {
+  try {
+    const lessons = await Lesson.find({}).lean();
+    const assignment = await Assignment.findById(req.params.id).lean();
+    
+    if (!assignment) {
+      return res.redirect("/instructor/assignments?error=Assignment not found");
+    }
+    
+    res.render("assignments-edit", {
+      user: global.currentUser,
+      assignment, 
+      lessons
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while loading the form.");
+  }
+});
+
+// POST route to update an assignment
+router.post("/instructor/assignments-edit/:id", requireLogin, requireRole("teacher"), async (req, res) => {
+  try {
+    const { title, body, weighting, lessonId } = req.body;
+    const assignment = await Assignment.findOne({ _id: new ObjectId(req.params.id) }).lean();
+
+    // Validate input
+    if (!title || !body || !weighting || !lessonId) {
+      const lessons = await Lesson.find({}).lean();
+      
+      return res.render("assignments-edit", {
+        user: global.currentUser,
+        assignment: {...assignment, ...req.body},
+        error: "All fields are required."
+      });
+    }
+
+    // Update the assignment
+    const result = await Assignment.updateOne(
+      { 
+        _id: req.params.id
+      },
+      { $set: { title, body, weighting, lessonId } }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.redirect("/instructor/assignments?error=Assignment not found");
+    }
+
+    return res.redirect("/instructor/assignments?msg=Assignment updated successfully");
+  } catch (err) {
+    console.error(err);
+    
+    const lessons = await Lesson.find({}).lean();
+    return res.render("assignments-edit", { 
+      user: global.currentUser, 
+      lessons, 
+      error: "Could not update assignment.", 
+      assignment: req.body
+    });
+  }
+});
+
 
 module.exports = router;
