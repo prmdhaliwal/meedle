@@ -5,6 +5,7 @@ const User = require("../models/User");
 const Course = require("../models/course");
 const Lesson = require("../models/lesson");
 const Enrollment = require("../models/enrollment");
+const Assignment = require("../models/assignments");
 
 
 // Authentication
@@ -76,9 +77,13 @@ router.get("/lessons/:id", requireLogin, async (req, res) => {
     const lesson = await Lesson.findById(req.params.id).populate("course").lean();
     if (!lesson) return res.status(404).send("Lesson not found");
 
+     // Fetch assignments tied to this lesson
+    const assignments = await Assignment.find({ lessonId: String(lesson._id) }).lean();
+
     res.render("lesson-view", {
       user: global.currentUser,
       lesson,
+      assignments,
     });
   } catch (err) {
     console.error(err);

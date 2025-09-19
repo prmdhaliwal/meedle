@@ -9,4 +9,27 @@
   <pre class="bg-white p-3 border rounded"><%= lesson.content || "" %></pre>
 </div>
 
+<div class="container" style="max-width: 800px; margin-top: 20px;">
+  <h5 class="text-primary" style="margin-bottom: 12px;">Assignments</h5>
+
+  <% if (assignments && assignments.length > 0) { %>
+    <ul class="list-group">
+      <% assignments.forEach(function(a){ %>
+        <li class="list-group-item">
+          <div style="font-weight:600;"><%= a.title %></div>
+          <% if (a.weighting) { %>
+            <div style="color:#6b7280; font-size:13px;">Weighting: <%= a.weighting %>%</div>
+          <% } %>
+          <% if (a.body) { %>
+            <pre class="bg-white p-2 border rounded mt-2" style="white-space:pre-wrap;"><%= a.body %></pre>
+          <% } %>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <div class="alert alert-secondary">No assignments yet for this lesson.</div>
+  <% } %>
+</div>
+
+
 <%- include('partials/footer') %>
