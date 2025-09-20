@@ -7,7 +7,7 @@ const Lesson = require("../models/lesson");
 const Enrollment = require("../models/enrollment");
 const Assignment = require("../models/assignments");
 const LessonCompletion = require("../models/lesson_completion");
-
+const Submission = require("../models/submission");
 
 // Authentication
 function requireLogin(req, res, next) {
@@ -107,17 +107,32 @@ router.get("/lessons/:id", requireLogin, async (req, res) => {
       isCompleted = !!comp;
     }
 
-    res.render("lesson-view", {
+    let assignmentsWithFlag = assignments;
+    if (global.currentUser && global.currentUser.role === "student" && assignments.length > 0) {
+      const assignIds = assignments.map(a => a._id);
+      const subs = await Submission.find({
+        student: global.currentUser._id,
+        assignment: { $in: assignIds }
+      }).lean();
+      const submittedSet = new Set(subs.map(s => String(s.assignment)));
+      assignmentsWithFlag = assignments.map(a => ({
+        ...a,
+        isSubmitted: submittedSet.has(String(a._id))
+      }));
+    }
+
+    return res.render("lesson-view", {
       user: global.currentUser,
       lesson,
-      assignments,
-      isCompleted  
+      assignments: assignmentsWithFlag, 
+      isCompleted
     });
   } catch (err) {
     console.error(err);
     res.status(500).send("Server error");
   }
 });
+
 
 
 // View all students
