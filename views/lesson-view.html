@@ -1,7 +1,12 @@
 <%- include('partials/header') %>
 
 <div class="album p-3 mb-5 bg-primary">
-  <h1 class="text-center text-white"><%= lesson.course.code %> — <%= lesson.title %></h1>
+  <h1 class="text-center text-white">
+    <%= lesson.course.code %> — <%= lesson.title %>
+    <% if (isCompleted) { %>
+      <span class="badge bg-success ms-2">Completed</span>
+    <% } %>
+  </h1>
 </div>
 
 <div class="container" style="max-width: 800px;">

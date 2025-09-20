@@ -6,6 +6,7 @@ const Course = require("../models/course");
 const Lesson = require("../models/lesson");
 const Enrollment = require("../models/enrollment");
 const Assignment = require("../models/assignments");
+const LessonCompletion = require("../models/lesson_completion");
 
 
 // Authentication
@@ -60,16 +61,34 @@ router.get("/courses/:id/lessons", requireLogin, async (req, res) => {
       .sort({ createdAt: 1 })
       .lean();
 
+    let lessonsWithFlag = lessons;
+
+    // Completion for students
+    if (global.currentUser && global.currentUser.role === "student" && lessons.length > 0) {
+      const lessonIds = lessons.map(l => l._id);
+      const completions = await LessonCompletion.find({
+        student: global.currentUser._id,
+        lesson: { $in: lessonIds }
+      }).lean();
+
+      const completedSet = new Set(completions.map(c => String(c.lesson)));
+      lessonsWithFlag = lessons.map(l => ({
+        ...l,
+        isCompleted: completedSet.has(String(l._id))
+      }));
+    }
+
     res.render("course-lessons", {
       user: global.currentUser,
       course,
-      lessons,
+      lessons: lessonsWithFlag,
     });
   } catch (err) {
     console.error(err);
     res.status(500).send("Server error");
   }
 });
+
 
 // View lessons
 router.get("/lessons/:id", requireLogin, async (req, res) => {
@@ -77,19 +96,29 @@ router.get("/lessons/:id", requireLogin, async (req, res) => {
     const lesson = await Lesson.findById(req.params.id).populate("course").lean();
     if (!lesson) return res.status(404).send("Lesson not found");
 
-     // Fetch assignments tied to this lesson
     const assignments = await Assignment.find({ lessonId: String(lesson._id) }).lean();
+
+    let isCompleted = false;
+    if (global.currentUser && global.currentUser.role === "student") {
+      const comp = await LessonCompletion.findOne({
+        student: global.currentUser._id,
+        lesson: lesson._id
+      }).lean();
+      isCompleted = !!comp;
+    }
 
     res.render("lesson-view", {
       user: global.currentUser,
       lesson,
       assignments,
+      isCompleted  
     });
   } catch (err) {
     console.error(err);
     res.status(500).send("Server error");
   }
 });
+
 
 // View all students
 router.get("/instructor/students", requireLogin, requireRole("teacher"), async (req, res) => {
