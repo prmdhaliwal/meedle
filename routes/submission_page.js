@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Submission = require("../models/submission");
 const { Classroom } = require("../models/class");
- 
+
 const Assignment = require("../models/assignments");
 const LessonCompletion = require("../models/lesson_completion");
 const mongoose = require("mongoose");
@@ -12,17 +12,40 @@ function requireLogin(req, res, next) {
   next();
 }
 
-// Shows submission page
-router.get("/new", requireLogin, (req, res) => {
-  const { assignmentId } = req.query;
-  res.render("submission_page", {
-    Classroom: "",
-    assignments: "",
-    content: "",
-    assignmentId: assignmentId || "",
-    created: false,
-    error: null
-  });
+// Shows submission page (now passes lessonId for the Back button)
+router.get("/new", requireLogin, async (req, res) => {
+  try {
+    const { assignmentId } = req.query;
+
+    let lessonId = "";
+    if (assignmentId) {
+      const assignment = await Assignment.findById(assignmentId).lean();
+      if (assignment) {
+        lessonId =
+          typeof assignment.lessonId === "string"
+            ? assignment.lessonId
+            : (assignment.lessonId?._id || assignment.lessonId);
+      }
+    }
+
+    res.render("submission_page", {
+      Classroom: "",
+      assignments: "",
+      content: "",
+      assignmentId: assignmentId || "",
+      lessonId: lessonId || "",
+      created: false,
+      error: null
+    });
+  } catch (err) {
+    console.error("[GET /submission/new] error:", err);
+    res.status(500).render("submission_page", {
+      assignmentId: req.query.assignmentId || "",
+      lessonId: "",
+      created: false,
+      error: "Failed to load submission page."
+    });
+  }
 });
 
 router.post("/", requireLogin, async (req, res) => {
@@ -32,6 +55,7 @@ router.post("/", requireLogin, async (req, res) => {
     if (!assignmentId || !answer || !answer.trim()) {
       return res.status(400).render("submission_page", {
         assignmentId: assignmentId || "",
+        lessonId: "",
         created: false,
         error: "Please provide an answer before submitting."
       });
@@ -42,6 +66,7 @@ router.post("/", requireLogin, async (req, res) => {
     if (!assignment) {
       return res.status(404).render("submission_page", {
         assignmentId,
+        lessonId: "",
         created: false,
         error: "Assignment not found."
       });
@@ -54,7 +79,7 @@ router.post("/", requireLogin, async (req, res) => {
       answer: answer.trim()
     });
 
-    //mark the lesson as completed for this student
+    // mark the lesson as completed for this student
     const rawLessonId =
       typeof assignment.lessonId === "string"
         ? assignment.lessonId
@@ -74,16 +99,14 @@ router.post("/", requireLogin, async (req, res) => {
       { upsert: true }
     );
 
-    //show success
-    return res.render("submission_page", {
-      assignmentId,
-      created: true,
-      error: null
-    });
+    // redirect back to the lesson
+    const lessonIdForRedirect = lessonObjectId ? lessonObjectId.toString() : String(rawLessonId || "");
+    return res.redirect(`/lessons/${lessonIdForRedirect}?submitted=1`);
   } catch (err) {
     console.error("[POST /submission] error:", err);
     return res.status(500).render("submission_page", {
       assignmentId: req.body.assignmentId || "",
+      lessonId: "",
       created: false,
       error: "Failed to save submission. Please try again."
     });
