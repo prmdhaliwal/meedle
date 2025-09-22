@@ -5,11 +5,13 @@ const app = express();
 const PORT_NUMBER = 8080;
 const studentCourses = require("./routes/studentcourses")
 const studentClasses = require("./routes/studentclasses.js")
+const instructorClasses = require("./routes/instructorclasses.js")
 const { ClassEnrollment } = require("./models/class"); 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use("/student", studentCourses);
 app.use("/student", studentClasses);
+app.use("/instructor", instructorClasses);
 
 // Routers
 const authRoutes = require("./routes/auth");
