@@ -14,8 +14,33 @@
             <div class="album p-3 mb-5 bg-primary">
                 <h1 class="text-center text-white">Classes</h1>
             </div>
-        </main>
-    </body>
+
+            <div class="container" style="max-width: 980px;">
+      <div class="row g-3">
+        <% if (classes && classes.length > 0) { %>
+          <% classes.forEach(function(c){ %>
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                  <h5 class="card-title"><%= c.course.code %> — <%= c.title %></h5>
+                  <p class="card-text mb-1"><strong>Course:</strong> <%= c.course.title %></p>
+                  <p class="card-text mb-1"><strong>Term:</strong> <%= c.term || "N/A" %></p>
+                  <p class="card-text small text-muted">
+                    Instructor: <%= c.instructor ? c.instructor.name : "Unknown" %>
+                  </p>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="alert alert-secondary">
+            No classes available.
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </main>
+</body>
 </html>
 
-
+<%- include('partials/footer') %>
