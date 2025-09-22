@@ -1,0 +1,59 @@
+<%- include('partials/header') %>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Assignments</title>
+    <link href="/bootstrap.min.css" rel="stylesheet" />
+  </head>
+  <body class="bg-light">
+    <main>
+      <div class="album p-3 mb-5 bg-primary">
+        <h1 class="text-center text-white">Lessons</h1>
+      </div>
+
+      <div class="container" style="max-width: 980px;">
+        <!-- small header with count + manage button -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="text-muted">
+            <%= lessons && lessons.length ? lesson.length : 0 %> lesson<%= (lessons && lessons.length === 1) ? "" : "s" %>
+          </div>
+          <a class="btn btn-primary" href="/instructor/assignments-edit">Manage Lessons</a>
+        </div>
+
+        <!-- Empty state -->
+        <% if (!lessons || lessons.length === 0) { %>
+          <div class="alert alert-secondary">
+            No Lessons.
+          </div>
+        <% } %>
+
+        <!-- Cards -->
+        <div class="row g-3">
+          <% (lessons || []).forEach(function(c){ %>
+            <div class="col-12">
+              <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                  <h5 class="card-title mb-1"><%= c.title %></h5>
+                  <p class="card-text text-muted small mb-0"><%= c.body || "" %></p>
+
+                  <div class="d-flex justify-content-end gap-2">
+                    <a href="/instructor/lesson-edit/<%= c._id %>" class="btn btn-sm btn-outline-primary">Edit</a>
+                    <!-- will need to fix above and below for proper routing -->
+                    <form method="POST" action="/instructor/lesson-delete/<%= c._id %>" 
+                        onsubmit="return confirm('Are you sure?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                  </form>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
+<%- include('partials/footer') %>
