@@ -7,6 +7,6 @@ const AssignmentSchema = new mongoose.Schema({
     lessonId: { type: String, required: true }
 }, { timestamps: true });
 
-AssignmentSchema.index({ lessonId: 1 }, { unique: true });
+// AssignmentSchema.index({ lessonId: 1 }, { unique: true });
 
 module.exports = mongoose.model('Assignment', AssignmentSchema);
