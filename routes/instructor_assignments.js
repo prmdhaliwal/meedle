@@ -109,12 +109,12 @@ const { ObjectId } = require("mongodb");
 // delete assignment
 router.post("/instructor/assignments-delete/:id", requireLogin, requireRole("teacher"), async (req, res) => {
   try {
-    const assignmentId = req.params.id;
+    const assignment = await Assignment.deleteOne({ _id: req.params.id });
 
     
-    await Assignment.deleteOne({
-      _id: assignmentId,
-    });
+    if (assignment.deletedCount === 0) {
+      return res.redirect("/instructor/assignments?msg=Assignment%20not%20found");
+    }
 
     return res.redirect("/instructor/assignments?msg=Assignment%20deleted");
   } catch (err) {

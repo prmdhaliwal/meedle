@@ -203,16 +203,22 @@ router.post("/instructor/lessons/edit/:id", requireLogin, requireRole("teacher")
 });
 
 // instructor delete lessons
-router.get("/instructor/lessons/delete", requireLogin, requireRole("teacher"), async (req, res) => {
+router.post("/instructor/lessons/delete/:id", requireLogin, requireRole("teacher"), async (req, res) => {
   try {
-    // get lessons, could change to get only teacher's created lessons
-    const lessons = await Lesson.find({}).lean();
+    // get lesson to delete, could change to get only teacher's created lessons
+    const lesson = await Lesson.deleteOne({ _id: req.params.id });
 
-    console.log("Lessons fetched:", lessons);
+    if (lesson.deletedCount === 0) {
+      return res.redirect("/instructor/lessons-overview?error=Lesson not found");
+    }
+
+    return res.redirect("/instructor/lessons-overview?msg=Lesson deleted successfully");
+
+    
+  } catch (err) {
     res.render("lessons-overview", {
       lessons, 
     });
-  } catch (err) {
     console.error(err);
     res.status(500).send("An error occurred while loading the lessons.");
   }
