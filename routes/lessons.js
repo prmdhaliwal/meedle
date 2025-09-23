@@ -1,56 +1,54 @@
 // routes/lessons.js
 const express = require("express");
-const { ObjectId } = require("mongodb");
 const router = express.Router();
-const User = require("../models/User"); 
+const User = require("../models/User");
 const Course = require("../models/course");
 const Lesson = require("../models/lesson");
 const Enrollment = require("../models/enrollment");
-
+const { Classroom } = require("../models/class"); // Move this to the top
 
 // Authentication
 function requireLogin(req, res, next) {
-    if (!global.currentUser) return res.redirect("/auth/login");
+  if (!global.currentUser) return res.redirect("/auth/login");
   next();
 }
 
 function requireRole(role) {
-    return (req, res, next) => {
-        if (!global.currentUser || global.currentUser.role != role) {
-            return res.status(403).send("Teachers only");
-        }
-        next();
-    };
+  return (req, res, next) => {
+    if (!global.currentUser || global.currentUser.role != role) {
+      return res.status(403).send("Teachers only");
+    }
+    next();
+  };
 }
 
 
 // Create lessons
 router.get("/instructor/lessons/new", requireLogin, requireRole("teacher"), async (req, res) => {
-    const courses = await Course.find({}).lean();
-    res.render("lesson-new", { user: global.currentUser, courses, error: null, created: req.query.created === "1" });
+  const courses = await Course.find({}).lean();
+  res.render("lesson-new", { user: global.currentUser, courses, error: null, created: req.query.created === "1" });
 });
 
 router.post("/instructor/lessons", requireLogin, requireRole("teacher"), async (req, res) => {
-    try {
-        const { courseId, title, content } = req.body
+  try {
+    const { courseId, title, content } = req.body;
 
-        const lesson = new Lesson({
-            course: courseId,
-            title,
-            content
-        })
+    const lesson = new Lesson({
+      course: courseId,
+      title,
+      content
+    });
 
-        await lesson.save();
-        return res.redirect("/instructor/lessons/new?created=1");
-    }
-    catch (err) {
-        console.error(err);
+    await lesson.save();
+    return res.redirect("/instructor/lessons/new?created=1");
+  } catch (err) {
+    console.error(err);
     const courses = await Course.find({}).lean();
     return res.render("lesson-new", { user: global.currentUser, courses, error: "Could not create lesson.", created: false });
-    }
+  }
 });
 
-// List lessons
+// List lessons - This route looks correct now!
 router.get("/courses/:id/lessons", requireLogin, async (req, res) => {
   try {
     const course = await Course.findById(req.params.id).lean();
@@ -60,10 +58,16 @@ router.get("/courses/:id/lessons", requireLogin, async (req, res) => {
       .sort({ createdAt: 1 })
       .lean();
 
+    // Find the class/instructor for this course - This is correct!
+    const classInfo = await Classroom.findOne({ course: course._id })
+      .populate("instructor", "name email")
+      .lean();
+
     res.render("course-lessons", {
       user: global.currentUser,
       course,
       lessons,
+      instructor: classInfo?.instructor || null // This fixes the error!
     });
   } catch (err) {
     console.error(err);
@@ -203,22 +207,16 @@ router.post("/instructor/lessons/edit/:id", requireLogin, requireRole("teacher")
 });
 
 // instructor delete lessons
-router.post("/instructor/lessons/delete/:id", requireLogin, requireRole("teacher"), async (req, res) => {
+router.get("/instructor/lessons/delete", requireLogin, requireRole("teacher"), async (req, res) => {
   try {
-    // get lesson to delete, could change to get only teacher's created lessons
-    const lesson = await Lesson.deleteOne({ _id: req.params.id });
+    // get lessons, could change to get only teacher's created lessons
+    const lessons = await Lesson.find({}).lean();
 
-    if (lesson.deletedCount === 0) {
-      return res.redirect("/instructor/lessons-overview?error=Lesson not found");
-    }
-
-    return res.redirect("/instructor/lessons-overview?msg=Lesson deleted successfully");
-
-    
-  } catch (err) {
+    console.log("Lessons fetched:", lessons);
     res.render("lessons-overview", {
       lessons, 
     });
+  } catch (err) {
     console.error(err);
     res.status(500).send("An error occurred while loading the lessons.");
   }

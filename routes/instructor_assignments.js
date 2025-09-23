@@ -27,13 +27,11 @@ router.get("/instructor/assignments-edit", requireLogin, requireRole("teacher"),
   try {
     // get assignments 
     const assignments = await Assignment.find({}).lean();
-    const lessons = await Lesson.find({}).lean();
 
     res.render("assignments-edit", {
       user: global.currentUser,
       assignments, 
       created: false, 
-      lessons,
     });
   } catch (err) {
     console.error(err);
@@ -69,7 +67,7 @@ router.post("/instructor/assignments-edit", requireLogin, requireRole("teacher")
 
     await assignment.save();
 
-    return res.redirect("/instructor/assignments?msg=Assignment%20added");
+    return res.redirect("/instructor/assignments-edit?msg=Assignment%20added");
   } catch (err) {
     console.error(err);
 
@@ -109,12 +107,12 @@ const { ObjectId } = require("mongodb");
 // delete assignment
 router.post("/instructor/assignments-delete/:id", requireLogin, requireRole("teacher"), async (req, res) => {
   try {
-    const assignment = await Assignment.deleteOne({ _id: req.params.id });
+    const assignmentId = req.params.id;
 
     
-    if (assignment.deletedCount === 0) {
-      return res.redirect("/instructor/assignments?msg=Assignment%20not%20found");
-    }
+    await Assignment.deleteOne({
+      _id: assignmentId,
+    });
 
     return res.redirect("/instructor/assignments?msg=Assignment%20deleted");
   } catch (err) {
