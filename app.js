@@ -16,7 +16,6 @@ const authRoutes = require("./routes/auth");
 const lessonRoutes = require("./routes/lessons");
 const assignmentRoutes = require("./routes/instructor_assignments");
 
-
 //References to the static assets
 app.use(express.static("node_modules/bootstrap/dist/css"));
 app.use(express.static("images")); //This one means statics are in images folder. So paths will just be /porsche.jpg for example rather than absolute paths
