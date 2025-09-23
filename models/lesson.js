@@ -19,4 +19,4 @@ ClassLessonSchema.index({ classroom: 1, lesson: 1}, { unique: true});
 const Lesson = mongoose.models.Lesson || mongoose.model("Lesson", LessonSchema);
 const ClassLesson = mongoose.models.ClassLesson || mongoose.model("ClassLesson", ClassLessonSchema);
 
-module.exports = mongoose.model(Lesson, ClassLesson);
+module.exports = { Lesson, ClassLesson };
