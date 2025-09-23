@@ -114,4 +114,21 @@ router.get("/instructor/students", requireLogin, requireRole("teacher"), async (
     }
 });
 
+// instructor lessons overview
+router.get("/instructor/lessons-overview", requireLogin, requireRole("teacher"), async (req, res) => {
+  try {
+    // get lessons, could change to get only teacher's created lessons
+    const lessons = await Lesson.find({}).lean();
+
+    console.log("Lessons fetched:", lessons);
+    res.render("lessons-overview", {
+      lessons, 
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while loading the lessons.");
+  }
+});
+
+
 module.exports = router;
