@@ -1,7 +1,7 @@
 <%- include('partials/header') %>
 
 <div class="album p-3 mb-5">
-  <h1 class="text-center text-dark">Create Lesson</h1>
+  <h1 class="text-center text-dark">Lesson</h1>
 </div>
 
 <div class="container" style="max-width: 800px;">
@@ -13,14 +13,28 @@
     <div class="alert alert-success">Lesson created!</div>
   <% } %>
 
-  <form method="POST" action="/instructor/lessons">
+  <% if (typeof updated !== 'undefined' && updated) { %>
+    <div class="alert alert-success">Lesson updated!</div>
+  <% } %>
+
+  <form method="POST" action="<%= (typeof lesson != 'undefined' && lesson) ? `/instructor/lessons/edit/${lesson._id}` : '/instructor/lessons' %>">
     <!-- Course dropdown -->
     <div class="mb-3">
       <label class="form-label">Course</label>
       <select class="form-select" name="courseId" required>
         <option value="" disabled selected>Select a course</option>
         <% (courses || []).forEach(function(c){ %>
-          <option value="<%= c._id %>"><%= c.code %> — <%= c.title %></option>
+          <option value="<%= c._id %>" 
+            <% if (typeof lesson !== 'undefined' && lesson && lesson.course) { %>
+              <% if (typeof lesson.course === 'object') { %>
+                <%= lesson.course._id.toString() === c._id.toString() ? 'selected' : '' %>
+              <% } else { %>
+                <%= lesson.course.toString() === c._id.toString() ? 'selected' : '' %>
+              <% } %>
+            <% } %>
+          >
+            <%= c.code %> — <%= c.title %>
+          </option>
         <% }) %>
       </select>
     </div>
@@ -28,16 +42,22 @@
     <!-- Lesson title -->
     <div class="mb-3">
       <label class="form-label">Lesson title</label>
-      <input type="text" class="form-control" name="title" required />
+      <input type="text" class="form-control" name="title" required
+      value="<%= (typeof lesson !== 'undefined' && lesson) ? lesson.title : '' %>"
+      />
     </div>
 
     <!-- Lesson content -->
     <div class="mb-3">
       <label class="form-label">Content</label>
-      <textarea class="form-control" name="content" rows="8" placeholder="Write lesson content here..." required></textarea>
+      <textarea class="form-control" name="content" rows="8" placeholder="Write lesson content here..." required><% if (typeof lesson !== 'undefined' && lesson) { %><%= lesson.content %><% } %></textarea>
     </div>
 
-    <button type="submit" class="btn btn-primary">Create Lesson</button>
+    <% if (typeof lesson !== 'undefined' && lesson) { %>
+      <button type="submit" class="btn btn-primary">Update Lesson</button>
+    <% } else { %>
+      <button type="submit" class="btn btn-primary">Create Lesson</button>
+    <% } %>
   </form>
 </div>
 
