@@ -42,14 +42,9 @@
             <a href="/instructor/lessons/new" class="btn btn-primary">Create Lesson</a>
             <a href="/instructor/students" class="btn btn-primary">View All Students</a>
         <% } %>
-
         <% if (user && user.role == "teacher") { %>
             <a href="/instructor/assignments-edit" class="btn btn-success">Add New Assignments</a>
             <a href="/instructor/marking" class="btn btn-success">Student Marking</a>
-        <% } %>
-
-        <% if (user && user.role == "teacher") { %>
-            <a href="/instructor/lessons-overview" class="btn btn-success">Lessons</a>
         <% } %>
     </div>
 
