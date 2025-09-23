@@ -1,5 +1,4 @@
 <%- include('partials/header') %>
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -35,13 +34,9 @@
           <% (courses || []).forEach(function(c){ %>
             <div class="col-12 col-md-6 col-lg-4">
               <div class="card h-100 shadow-sm">
-                <div class="card-body d-flex flex-column">
+                <div class="card-body">
                   <h5 class="card-title mb-1"><%= c.code %> — <%= c.title %></h5>
                   <p class="card-text text-muted small mb-0"><%= c.description || "" %></p>
-
-                  <div class="mt-auto">
-                    <a href="/courses/<%= c._id %>/lessons" class="btn btn-sm btn-outline-primary w-100">View Lessons</a>
-                  </div>
                 </div>
               </div>
             </div>
@@ -51,4 +46,3 @@
     </main>
   </body>
 </html>
-<%- include('partials/footer') %>
