@@ -61,13 +61,21 @@ app.get("/", async (req, res) => {
     let myClasses = [];
   try {
     const enrolls = await ClassEnrollment.find({ student: me._id })
-      .populate({ path: "classroom", populate: { path: "course" } })
+      .populate({ 
+        path: "classroom", 
+        populate: [
+          { path: "course" },
+          { path: "instructor", select: "name email"}
+        ] 
+      })
       .lean();
 
     myClasses = enrolls.map(e => ({
       title: e.classroom?.title || "(Untitled)",
       term:  e.classroom?.term  || "",
-      code:  e.classroom?.course?.code || ""
+      code:  e.classroom?.course?.code || "",
+      instructorName: e.classroom?.instructor?.name || "TBA",
+      instructorEmail: e.classroom?.instructor?.email || ""
     }));
   } catch (err) {
     console.error("[/] load classes error:", err.message);
@@ -76,6 +84,9 @@ app.get("/", async (req, res) => {
   return res.render("index", { myClasses});
 
 });   
+
+
+
 
 app.use("/auth", authRoutes); 
 app.use("/", lessonRoutes)
