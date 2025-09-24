@@ -25,7 +25,6 @@ router.get("/manage-enrollments", requireLogin, async (req, res) => {
 
     res.render("manage-enrollments", { user: me, courses, enrolledIds, msg });
   } catch (err) {
-    console.error(err);
     res.status(500).send("Server error");
   }
 });
@@ -38,7 +37,6 @@ router.get("/courses", requireLogin, async (req, res) => {
     const courses = enrolls.map(e => e.course).filter(Boolean);
     res.render("student-courses", { user: me, courses });
   } catch (err) {
-    console.error(err);
     res.status(500).send("Server error");
   }
 });
@@ -55,7 +53,6 @@ router.get("/api/my-courses", requireLogin, async (req, res) => {
     const courses = enrolls.map(e => e.course).filter(Boolean);
     res.json({ student_id: String(me._id), courses });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -78,7 +75,6 @@ router.post("/enroll", requireLogin, async (req, res) => {
 
     return res.redirect("/student/manage-enrollments?msg=Enrolled%20in%20" + encodeURIComponent(course.code));
   } catch (err) {
-    console.error(err);
     return res.redirect("/student/manage-enrollments?msg=Error%20enrolling");
   }
 });
@@ -93,7 +89,6 @@ router.post("/unenroll", requireLogin, async (req, res) => {
 
     return res.redirect("/student/manage-enrollments?msg=Unenrolled");
   } catch (err) {
-    console.error(err);
     return res.redirect("/student/manage-enrollments?msg=Error%20unenrolling");
   }
 });

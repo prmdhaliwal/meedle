@@ -155,7 +155,6 @@ router.post("/instructor/lessons", requireLogin, requireRole("teacher"), async (
     await lesson.save();
     return res.redirect("/instructor/lessons/new?created=1");
   } catch (err) {
-    console.error(err);
     const courses = await Course.find({}).lean();
     return res.render("lesson-new", { user: global.currentUser, courses, error: "Could not create lesson.", created: false, lesson: makeDraft(req.body) });
   }
@@ -209,7 +208,6 @@ router.get("/courses/:id/lessons", requireLogin, async (req, res) => {
       instructor: classInfo?.instructor || null
     });
   } catch (err) {
-    console.error(err);
     res.status(500).send("Server error");
   }
 });
@@ -261,7 +259,6 @@ router.get("/lessons/:id", requireLogin, async (req, res) => {
       canViewContent: !lockInfo.locked
     });
   } catch (err) {
-    console.error(err);
     res.status(500).send("Server error");
   }
 });
@@ -289,7 +286,6 @@ router.get("/instructor/lessons/edit/:id", requireLogin, requireRole("teacher"),
       error: null
     });
   } catch (err) {
-    console.error(err);
     res.status(500).send("Server error");
   }
 });
@@ -360,7 +356,6 @@ router.post("/instructor/lessons/edit/:id", requireLogin, requireRole("teacher")
     await lesson.save();
     return res.redirect("/courses/" + lesson.course + "/lessons");
   } catch (err) {
-    console.error(err);
     const courses = await Course.find({}).lean();
     const draft = makeDraft(req.body);
     draft._id = req.params.id;
@@ -406,7 +401,6 @@ router.get("/instructor/students", requireLogin, requireRole("teacher"), async (
         }
 
     } catch (err) {
-        console.error(err);
         res.status(500).send("Server error");
     }
 });
@@ -423,7 +417,6 @@ router.get("/instructor/lessons-overview", requireLogin, requireRole("teacher"),
       courses
     });
   } catch (err) {
-    console.error(err);
     res.status(500).send("An error occurred while loading the lessons.");
   }
 });
@@ -445,7 +438,6 @@ router.get("/instructor/lessons/edit/:id", requireLogin, requireRole("teacher"),
       courses,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).send("An error occurred while loading the form.");
   }
 });
@@ -483,7 +475,6 @@ router.post("/instructor/lessons/edit/:id", requireLogin, requireRole("teacher")
 
     return res.redirect("/instructor/lessons-overview/?msg=Lesson updated successfully");
   } catch (err) {
-    console.error(err);
     
     const lessons = await Lesson.find({}).lean();
     const courses = await Course.find({}).lean();
@@ -514,7 +505,6 @@ router.post("/instructor/lessons/delete/:id", requireLogin, requireRole("teacher
     res.render("lessons-overview", {
       lessons, 
     });
-    console.error(err);
     res.status(500).send("An error occurred while loading the lessons.");
   }
 });

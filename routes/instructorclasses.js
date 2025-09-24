@@ -25,7 +25,6 @@ router.get("/classes", requireLogin, requireRole("teacher"), async (req, res) =>
 
         res.render("instructor-classes", { user: global.currentUser, classes });
     }   catch (err) {
-        console.error(err);
         res.status(500).send("Error loading classes");
     }
 });

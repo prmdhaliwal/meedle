@@ -53,7 +53,6 @@ router.get("/:classId/assign-lesson", requireLogin, requireRole("teacher"), asyn
             msg
         });
     }   catch (err) {
-        console.error(err);
         res.status(500).send("Error loading lessons");
     }
 });
@@ -84,7 +83,6 @@ router.post("/:classId/assign", requireLogin, requireRole("teacher"), async (req
                  encodeURIComponent("Lesson assigned"));
 
     }   catch(err) {
-        console.error(err);
         res.redirect(`/instructor/classes/${req.params.classId}/assign-lesson?msg=` +
                  encodeURIComponent("Error assigning lesson"));
     }
@@ -101,7 +99,6 @@ router.post("/:classId/unassign", requireLogin, requireRole("teacher"), async (r
         res.redirect(`/instructor/classes/${classId}/assign-lesson?msg=` +
                     encodeURIComponent("Lesson unassigned"));
     } catch (err) {
-        console.error(err);
         res.redirect(`/instructor/classes/${req.params.classId}/assign-lesson?msg=` +
                     encodeURIComponent("Error unassigning lesson"));
     }

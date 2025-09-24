@@ -81,7 +81,7 @@ app.get("/", async (req, res) => {
       instructorEmail: e.classroom?.instructor?.email || ""
     }));
   } catch (err) {
-    console.error("[/] load classes error:", err.message);
+    res.send("ERROR")
   }
 
   return res.render("index", { myClasses});

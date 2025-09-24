@@ -47,7 +47,6 @@ router.get("/new", requireLogin, async (req, res) => {
       error: null
     });
   } catch (err) {
-    console.error("[GET /submission/new] error:", err);
     res.status(500).render("submission_page", {
       assignmentId: req.query.assignmentId || "",
       lessonId: "",
@@ -130,7 +129,6 @@ router.post("/", requireLogin, async (req, res) => {
       return res.redirect(`/lessons/${lessonIdForRedirect}?alreadySubmitted=1`);
     }
 
-    console.error("[POST /submission] error:", err);
     return res.status(500).render("submission_page", {
       assignmentId: req.body.assignmentId || "",
       lessonId: "",

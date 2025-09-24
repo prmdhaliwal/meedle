@@ -142,7 +142,6 @@ router.get("/deleteStudent/:id", async (req, res) => {
 
     res.redirect(`/instructor/students?successMessage=Student: ${student.name} deleted successfully`); // Redirect to the students list page after deletion
   } catch (error) {
-    console.error("Error deleting student:", error);
     res.status(500).send("Internal Server Error");
   }
 });
