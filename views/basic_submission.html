@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+  <title>Student Assignment Submission</title>
+  <style>
+    body { padding: 20px; }
+    .form-box { border: 1px solid ; padding: 20px; border-radius: 8px; width: 300px; }
+    #successMsg { color: green; margin-top: 10px; display: none; }
+  </style>
+</head>
+<body>
+  <h1>Assignment Submission Page</h1>
+  <div class="form-box">
+    <form id="submissionPage">
+      <label for="assignment">Upload your assignment:</label><br>
+      <input type="file" id="assignment" name="assignment"><br><br>
+      <button type="submit">Submit</button>
+    </form>
+    <div id="successMsg">Assignment submitted successfully</div>
+  </div>
+  <script>
+    const form = document.getElementById("submissionPage");
+    const input = document.getElementById("assignment");
+    const successMsg = document.getElementById("successMsg");
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      successMsg.style.display = "none";
+      if (input.files.length === 0) {
+        alert("No files selected. Please select a file.");
+      } else {
+        successMsg.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>

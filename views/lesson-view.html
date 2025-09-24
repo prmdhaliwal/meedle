@@ -1,14 +1,20 @@
 <%- include('partials/header') %>
 
 <div class="album p-3 mb-5 bg-primary">
-  <h1 class="text-center text-white"><%= lesson.course.code %> - <%= lesson.title %></h1>
+  <h1 class="text-center text-white">
+    <%= lesson.course.code %> - <%= lesson.title %>
+    <% if (isCompleted) { %>
+      <span class="badge bg-success ms-2">Completed</span>
+    <% } %>
+  </h1>
 </div>
 
 <div class="container" style="max-width: 800px;">
   <a href="/courses/<%= lesson.course._id %>/lessons" class="btn btn-link p-0 mb-3">&larr; Back to Lessons</a>
 
   <div class="alert alert-secondary">
-    <strong>Opens:</strong> <%= lesson.opensText || 'Immediately' %> - <strong>Closes:</strong> <%= lesson.closesText || 'Stays open' %>
+    <strong>Opens:</strong> <%= lesson.opensText || 'Immediately' %> - 
+    <strong>Closes:</strong> <%= lesson.closesText || 'Stays open' %>
   </div>
 
   <% if (!canViewContent) { %>
@@ -30,5 +36,37 @@
   <% } %>
 </div>
 
-<%- include('partials/footer') %>
+<div class="container" style="max-width: 800px; margin-top: 20px;">
+  <h5 class="text-primary" style="margin-bottom: 12px;">Assignments</h5>
 
+  <% if (assignments && assignments.length > 0) { %>
+    <ul class="list-group">
+      <% assignments.forEach(function(a){ %>
+        <li class="list-group-item">
+          <div style="font-weight:600;"><%= a.title %></div>
+          <% if (a.weighting) { %>
+            <div style="color:#6b7280; font-size:13px;">Weighting: <%= a.weighting %>%</div>
+          <% } %>
+          <% if (a.body) { %>
+            <pre class="bg-white p-2 border rounded mt-2" style="white-space:pre-wrap;"><%= a.body %></pre>
+          <% } %>
+
+          <div class="mt-2">
+            <% if (a.isSubmitted) { %>
+              <span class="badge bg-secondary">Submitted</span>
+            <% } else { %>
+              <a href="/submission/new?assignmentId=<%= a._id %>" 
+                 class="btn btn-outline-primary btn-sm">
+                Submit Assignment
+              </a>
+            <% } %>
+          </div>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <div class="alert alert-secondary">No assignments yet for this lesson.</div>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>
