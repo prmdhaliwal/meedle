@@ -4,6 +4,7 @@ const router = express.Router();
 require("../models/assignments"); 
 const Assignment = require("../models/assignments");
 const Lesson = require("../models/lesson");
+const Course = require("../models/course");
 const constants = require("constants");
 
 // check for login
@@ -28,6 +29,8 @@ router.get("/instructor/assignments-edit", requireLogin, requireRole("teacher"),
     // get assignments 
     const assignments = await Assignment.find({}).lean();
     const lessons = await Lesson.find({}).lean();
+
+    console.log("Lessons fetched", lessons);
 
     res.render("assignments-edit", {
       user: global.currentUser,
@@ -97,6 +100,7 @@ router.get("/instructor/assignments", requireLogin, requireRole("teacher"), asyn
     console.log("Assignments fetched:", assignments);
     res.render("assignments", {
       assignments, 
+      lessons,
     });
   } catch (err) {
     console.error(err);
