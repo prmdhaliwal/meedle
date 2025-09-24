@@ -418,7 +418,6 @@ router.get("/instructor/lessons-overview", requireLogin, requireRole("teacher"),
     const lessons = await Lesson.find({}).lean();
     const courses = await Course.find({}).lean();
 
-    console.log("Lessons fetched:", lessons);
     res.render("lessons-overview", {
       lessons, 
       courses

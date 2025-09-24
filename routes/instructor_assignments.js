@@ -94,7 +94,6 @@ router.get("/instructor/assignments", requireLogin, requireRole("teacher"), asyn
     const assignments = await Assignment.find({}).lean();
     const lessons = await Lesson.find({}).lean();
 
-    console.log("Assignments fetched:", assignments);
     res.render("assignments", {
       assignments, 
     });
