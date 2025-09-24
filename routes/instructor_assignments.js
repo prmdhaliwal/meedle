@@ -3,8 +3,7 @@ const express = require("express");
 const router = express.Router();
 require("../models/assignments"); 
 const Assignment = require("../models/assignments");
-const Lesson = require("../models/lesson");
-const Course = require("../models/course");
+const { Lesson } = require("../models/lesson");
 const constants = require("constants");
 
 // check for login
@@ -39,7 +38,6 @@ router.get("/instructor/assignments-edit", requireLogin, requireRole("teacher"),
       lessons,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).send("An error occurred while loading the assignments.");
   }
 });
@@ -74,7 +72,6 @@ router.post("/instructor/assignments-edit", requireLogin, requireRole("teacher")
 
     return res.redirect("/instructor/assignments?msg=Assignment%20added");
   } catch (err) {
-    console.error(err);
 
     // check for duplicate key error (MongoDB error code 11000)
     if (err.code === 11000) {
@@ -97,13 +94,11 @@ router.get("/instructor/assignments", requireLogin, requireRole("teacher"), asyn
     const assignments = await Assignment.find({}).lean();
     const lessons = await Lesson.find({}).lean();
 
-    console.log("Assignments fetched:", assignments);
     res.render("assignments", {
       assignments, 
       lessons,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).send("An error occurred while loading the assignments.");
   }
 });
@@ -122,7 +117,6 @@ router.post("/instructor/assignments-delete/:id", requireLogin, requireRole("tea
 
     return res.redirect("/instructor/assignments?msg=Assignment%20deleted");
   } catch (err) {
-    console.error(err);
     return res.redirect("/instructor/assignments?msg=Error%20deleting%20assignment");
   }
 });
@@ -143,7 +137,6 @@ router.get("/instructor/assignments-edit/:id", requireLogin, requireRole("teache
       lessons
     });
   } catch (err) {
-    console.error(err);
     res.status(500).send("An error occurred while loading the form.");
   }
 });
@@ -179,7 +172,6 @@ router.post("/instructor/assignments-edit/:id", requireLogin, requireRole("teach
 
     return res.redirect("/instructor/assignments?msg=Assignment updated successfully");
   } catch (err) {
-    console.error(err);
     
     const lessons = await Lesson.find({}).lean();
     return res.render("assignments-edit", { 

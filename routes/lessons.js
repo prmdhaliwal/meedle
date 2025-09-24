@@ -1,11 +1,16 @@
 // routes/lessons.js
 const express = require("express");
 const router = express.Router();
+
 const User = require("../models/User");
 const Course = require("../models/course");
-const Lesson = require("../models/lesson");
+const { Lesson } = require("../models/lesson");
 const Enrollment = require("../models/enrollment");
-const { Classroom } = require("../models/class"); // Move this to the top
+const { Classroom } = require("../models/class");
+
+const Assignment = require("../models/assignments");
+const LessonCompletion = require("../models/lesson_completion");
+const Submission = require("../models/submission");
 
 // Authentication
 function requireLogin(req, res, next) {
@@ -150,13 +155,11 @@ router.post("/instructor/lessons", requireLogin, requireRole("teacher"), async (
     await lesson.save();
     return res.redirect("/instructor/lessons/new?created=1");
   } catch (err) {
-    console.error(err);
     const courses = await Course.find({}).lean();
     return res.render("lesson-new", { user: global.currentUser, courses, error: "Could not create lesson.", created: false, lesson: makeDraft(req.body) });
   }
 });
 
-// List lessons - This route looks correct now!
 router.get("/courses/:id/lessons", requireLogin, async (req, res) => {
   try {
     const course = await Course.findById(req.params.id).lean();
@@ -166,31 +169,50 @@ router.get("/courses/:id/lessons", requireLogin, async (req, res) => {
       .sort({ createdAt: 1 })
       .lean();
 
-    const decorated = lessons.map((lesson) => {
-      const info = makeLockInfo(lesson, global.currentUser);
-      lesson.lockInfo = info;
-      lesson.isLocked = info.locked;
-      lesson.opensText = formatForDisplay(info.opensAt);
-      lesson.closesText = formatForDisplay(info.closesAt);
-      return lesson;
+    // add lock info
+    const decorated = lessons.map((l) => {
+      const info = makeLockInfo(l, global.currentUser);
+      return {
+        ...l,
+        lockInfo: info,
+        isLocked: info.locked,
+        opensText: formatForDisplay(info.opensAt),
+        closesText: formatForDisplay(info.closesAt)
+      };
     });
 
-    // Find the class/instructor for this course - This is correct!
+    // add completion flags for students
+    let decoratedWithFlags = decorated;
+    if (global.currentUser?.role === "student" && lessons.length > 0) {
+      const lessonIds = lessons.map(l => l._id);
+      const completions = await LessonCompletion.find({
+        student: global.currentUser._id,
+        lesson: { $in: lessonIds }
+      }).lean();
+      const completedSet = new Set(completions.map(c => String(c.lesson)));
+      decoratedWithFlags = decorated.map(l => ({
+        ...l,
+        isCompleted: completedSet.has(String(l._id))
+      }));
+    }
+
+    // instructor info for the course
     const classInfo = await Classroom.findOne({ course: course._id })
       .populate("instructor", "name email")
       .lean();
 
-    res.render("course-lessons", {
+    return res.render("course-lessons", {
       user: global.currentUser,
       course,
-      lessons: decorated,
-      instructor: classInfo?.instructor || null // This fixes the error!
+      lessons: decoratedWithFlags,           // <-- single, correct array
+      instructor: classInfo?.instructor || null
     });
   } catch (err) {
-    console.error(err);
     res.status(500).send("Server error");
   }
 });
+
+
 
 // View lessons
 router.get("/lessons/:id", requireLogin, async (req, res) => {
@@ -203,14 +225,40 @@ router.get("/lessons/:id", requireLogin, async (req, res) => {
     lesson.opensText = formatForDisplay(lockInfo.opensAt);
     lesson.closesText = formatForDisplay(lockInfo.closesAt);
 
-    res.render("lesson-view", {
+    const assignments = await Assignment.find({ lessonId: String(lesson._id) }).lean();
+
+    let isCompleted = false;
+    if (global.currentUser && global.currentUser.role === "student") {
+      const comp = await LessonCompletion.findOne({
+        student: global.currentUser._id,
+        lesson: lesson._id
+      }).lean();
+      isCompleted = !!comp;
+    }
+
+    let assignmentsWithFlag = assignments;
+    if (global.currentUser && global.currentUser.role === "student" && assignments.length > 0) {
+      const assignIds = assignments.map(a => a._id);
+      const subs = await Submission.find({
+        student: global.currentUser._id,
+        assignment: { $in: assignIds }
+      }).lean();
+      const submittedSet = new Set(subs.map(s => String(s.assignment)));
+      assignmentsWithFlag = assignments.map(a => ({
+        ...a,
+        isSubmitted: submittedSet.has(String(a._id))
+      }));
+    }
+
+    return res.render("lesson-view", {
       user: global.currentUser,
       lesson,
+      assignments: assignmentsWithFlag, 
+      isCompleted,
       lockInfo,
       canViewContent: !lockInfo.locked
     });
   } catch (err) {
-    console.error(err);
     res.status(500).send("Server error");
   }
 });
@@ -238,7 +286,6 @@ router.get("/instructor/lessons/edit/:id", requireLogin, requireRole("teacher"),
       error: null
     });
   } catch (err) {
-    console.error(err);
     res.status(500).send("Server error");
   }
 });
@@ -309,7 +356,6 @@ router.post("/instructor/lessons/edit/:id", requireLogin, requireRole("teacher")
     await lesson.save();
     return res.redirect("/courses/" + lesson.course + "/lessons");
   } catch (err) {
-    console.error(err);
     const courses = await Course.find({}).lean();
     const draft = makeDraft(req.body);
     draft._id = req.params.id;
@@ -321,6 +367,8 @@ router.post("/instructor/lessons/edit/:id", requireLogin, requireRole("teacher")
     });
   }
 });
+
+
 
 // View all students
 router.get("/instructor/students", requireLogin, requireRole("teacher"), async (req, res) => {
@@ -353,7 +401,6 @@ router.get("/instructor/students", requireLogin, requireRole("teacher"), async (
         }
 
     } catch (err) {
-        console.error(err);
         res.status(500).send("Server error");
     }
 });
@@ -365,13 +412,11 @@ router.get("/instructor/lessons-overview", requireLogin, requireRole("teacher"),
     const lessons = await Lesson.find({}).lean();
     const courses = await Course.find({}).lean();
 
-    console.log("Lessons fetched:", lessons);
     res.render("lessons-overview", {
       lessons, 
       courses
     });
   } catch (err) {
-    console.error(err);
     res.status(500).send("An error occurred while loading the lessons.");
   }
 });
@@ -393,7 +438,6 @@ router.get("/instructor/lessons/edit/:id", requireLogin, requireRole("teacher"),
       courses,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).send("An error occurred while loading the form.");
   }
 });
@@ -431,7 +475,6 @@ router.post("/instructor/lessons/edit/:id", requireLogin, requireRole("teacher")
 
     return res.redirect("/instructor/lessons-overview/?msg=Lesson updated successfully");
   } catch (err) {
-    console.error(err);
     
     const lessons = await Lesson.find({}).lean();
     const courses = await Course.find({}).lean();
@@ -462,7 +505,6 @@ router.post("/instructor/lessons/delete/:id", requireLogin, requireRole("teacher
     res.render("lessons-overview", {
       lessons, 
     });
-    console.error(err);
     res.status(500).send("An error occurred while loading the lessons.");
   }
 });

@@ -42,7 +42,6 @@ router.get("/classes", requireLogin, async (req, res) => {
 
     res.render("student-classes", { user: me, classes });
   } catch (err) {
-    console.error(err);
     res.status(500).send("Error loading classes");
   }
 });

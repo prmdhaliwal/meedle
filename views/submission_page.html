@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head>
+  <title>Student Assignment Submission</title>
+  <style>
+    body { padding: 20px; font-family: Arial, sans-serif; background-color: #f9f9f9; }
+    .form-box { border: 1px solid #ddd; padding: 20px; border-radius: 8px; width: 600px; background: #fff; }
+    label { font-weight: bold; display: block; margin-bottom: 8px; }
+    textarea { width: 95%; height: 150px; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; resize: vertical; display: block; margin: 0 auto; }
+    button { margin-top: 12px; background-color: #007bff; color: white; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
+    a.back-link { display: inline-block; margin-bottom: 15px; color: #0d6efd; text-decoration: none; }
+    a.back-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1 style="color:#007bff;">Assignment Submission</h1>
+  <div class="form-box">
+
+    <!-- Back to Lesson link -->
+    <% if (lessonId) { %>
+      <a href="/lessons/<%= lessonId %>" class="back-link">← Back to Lesson</a>
+    <% } %>
+
+    <!-- Submission form -->
+    <form method="POST" action="/submission">
+      <input type="hidden" name="assignmentId" value="<%= assignmentId || '' %>"/>
+      <label for="answer">Type your answer:</label>
+      <textarea id="answer" name="answer" placeholder="Enter your answer here..."></textarea>
+      <button type="submit">Submit</button>
+    </form>
+
+  </div>
+</body>
+</html>
