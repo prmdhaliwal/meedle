@@ -5,6 +5,29 @@
 </div>
 
 <div class="container" style="max-width: 800px;">
+  
+  <!-- Instructor Contact Information -->
+  <% if (instructor) { %>
+    <div class="card mb-4 bg-light">
+      <div class="card-body">
+        <h5 class="card-title">
+          <i class="fas fa-user-tie me-2"></i>Instructor Contact
+        </h5>
+        <p class="mb-1">
+          <strong>Name:</strong> <%= instructor.name %>
+        </p>
+        <p class="mb-0">
+          <strong>Email:</strong> 
+          <a href="mailto:<%= instructor.email %>" class="text-decoration-none">
+            <%= instructor.email %>
+          </a>
+        </p>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Lessons Section -->
+  <h3 class="mb-3">Course Lessons</h3>
   <% if (!lessons || lessons.length === 0) { %>
     <div class="alert alert-secondary">No lessons available for this course yet.</div>
   <% } else { %>
