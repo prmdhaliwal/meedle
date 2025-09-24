@@ -12,8 +12,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use("/student", studentCourses);
 app.use("/student", studentClasses);
+app.use("/instructor/classes", lessonClasses);
 app.use("/instructor", instructorClasses);
-app.use("/", lessonClasses);
+
 
 // Routers
 const authRoutes = require("./routes/auth");

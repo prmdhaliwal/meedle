@@ -17,7 +17,9 @@ function requireRole(role) {
     };
 }
 
-router.get("/instructor/classes/:classId/assign-lesson", requireLogin, requireRole("teacher"), async(req, res) => {
+router.get("/__ping", (req, res) => res.send("lessonclasses mounted"));
+
+router.get("/:classId/assign-lesson", requireLogin, requireRole("teacher"), async (req, res) => {
     try {
         const { classId } = req.params;
         const msg = req.query.msg || "";
@@ -57,7 +59,7 @@ router.get("/instructor/classes/:classId/assign-lesson", requireLogin, requireRo
 });
 
 // Assign a lesson to a class
-router.post("/instructor/classes/:classId/assign", requireLogin, requireRole("teacher"), async(req, res) => {
+router.post("/:classId/assign", requireLogin, requireRole("teacher"), async (req, res) => {
     try {
         const { classId } = req.params;
         const { lessonId } = req.body;
@@ -68,7 +70,7 @@ router.post("/instructor/classes/:classId/assign", requireLogin, requireRole("te
         const lesson = await Lesson.findOne({ _id: lessonId, course: c.course }).lean();
 
         if (!lesson) {
-            return res.redirect(`/instructor/classes/${classId}/manage-lessons?msg=` +
+            return res.redirect(`/instructor/classes/${classId}/assign-lesson?msg=` +
                           encodeURIComponent("Lesson not found for this unit"));
         }
 
@@ -78,29 +80,29 @@ router.post("/instructor/classes/:classId/assign", requireLogin, requireRole("te
             { upsert: true }
         );
 
-        res.redirect(`/instructor/classes/${classId}/manage-lessons?msg=` +
+        res.redirect(`/instructor/classes/${classId}/assign-lesson?msg=` +
                  encodeURIComponent("Lesson assigned"));
 
     }   catch(err) {
         console.error(err);
-        res.redirect(`/instructor/classes/${req.params.classId}/manage-lessons?msg=` +
+        res.redirect(`/instructor/classes/${req.params.classId}/assign-lesson?msg=` +
                  encodeURIComponent("Error assigning lesson"));
     }
 });
 
 // Unassign a lesson from a class
-router.post("/instructor/classes/:classId/unassign", requireLogin, requireRole("teacher"), async (req, res) => {
+router.post("/:classId/unassign", requireLogin, requireRole("teacher"), async (req, res) => {
     try {
         const { classId } = req.params;
         const { lessonId } = req.body;
 
         await ClassLesson.deleteOne({ classroom: classId, lesson: lessonId });
 
-        res.redirect(`/instructor/classes/${classId}/manage-lessons?msg=` +
+        res.redirect(`/instructor/classes/${classId}/assign-lesson?msg=` +
                     encodeURIComponent("Lesson unassigned"));
     } catch (err) {
         console.error(err);
-        res.redirect(`/instructor/classes/${req.params.classId}/manage-lessons?msg=` +
+        res.redirect(`/instructor/classes/${req.params.classId}/assign-lesson?msg=` +
                     encodeURIComponent("Error unassigning lesson"));
     }
 });
