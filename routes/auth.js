@@ -132,8 +132,6 @@ router.get("/logout", function(req, res) {
 router.get("/deleteStudent/:id", async (req, res) => {
   try {
     const studentId = req.params.id;
-    console.log(studentId);
-    
 
     // Find the student by ID and delete them
     const student = await User.findByIdAndDelete(studentId);
@@ -142,7 +140,7 @@ router.get("/deleteStudent/:id", async (req, res) => {
       return res.status(404).send("Student not found");
     }
 
-    res.redirect("/auth/deleteStudent"); // Redirect to the students list page after deletion
+    res.redirect(`/instructor/students?successMessage=Student: ${student.name} deleted successfully`); // Redirect to the students list page after deletion
   } catch (error) {
     console.error("Error deleting student:", error);
     res.status(500).send("Internal Server Error");
