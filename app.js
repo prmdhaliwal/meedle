@@ -80,6 +80,9 @@ app.get("/", async (req, res) => {
 
 });   
 
+
+
+
 app.use("/auth", authRoutes); 
 app.use("/", lessonRoutes)
 app.use("/", assignmentRoutes)

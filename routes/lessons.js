@@ -325,6 +325,9 @@ router.post("/instructor/lessons/edit/:id", requireLogin, requireRole("teacher")
 // View all students
 router.get("/instructor/students", requireLogin, requireRole("teacher"), async (req, res) => {
     try {
+      // See if there is a success message to display
+      const successMessage = req.query.successMessage;
+
       // Get all the students
         const students = await User.find({
           $or: [
@@ -343,12 +346,19 @@ router.get("/instructor/students", requireLogin, requireRole("teacher"), async (
             student.courses = courses;
         }
 
-        res.render("students-list", { students });
+        if (!successMessage) {
+          res.render("students-list", { students });
+        } else {
+          res.render("students-list", { students, successMessage }); 
+        }
+
     } catch (err) {
         console.error(err);
         res.status(500).send("Server error");
     }
 });
+
+
 
 module.exports = router;
 
