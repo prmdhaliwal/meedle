@@ -56,21 +56,13 @@ app.get("/", async (req, res) => {
     let myClasses = [];
   try {
     const enrolls = await ClassEnrollment.find({ student: me._id })
-      .populate({ 
-        path: "classroom", 
-        populate: [
-          { path: "course" },
-          { path: "instructor", select: "name email"}
-        ] 
-      })
+      .populate({ path: "classroom", populate: { path: "course" } })
       .lean();
 
     myClasses = enrolls.map(e => ({
       title: e.classroom?.title || "(Untitled)",
       term:  e.classroom?.term  || "",
-      code:  e.classroom?.course?.code || "",
-      instructorName: e.classroom?.instructor?.name || "TBA",
-      instructorEmail: e.classroom?.instructor?.email || ""
+      code:  e.classroom?.course?.code || ""
     }));
   } catch (err) {
     console.error("[/] load classes error:", err.message);
