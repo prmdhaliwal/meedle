@@ -1,12 +1,34 @@
 <%- include('partials/header') %>
 
 <div class="album p-3 mb-5 bg-primary">
-  <h1 class="text-center text-white"><%= lesson.course.code %> — <%= lesson.title %></h1>
+  <h1 class="text-center text-white"><%= lesson.course.code %> - <%= lesson.title %></h1>
 </div>
 
 <div class="container" style="max-width: 800px;">
   <a href="/courses/<%= lesson.course._id %>/lessons" class="btn btn-link p-0 mb-3">&larr; Back to Lessons</a>
-  <pre class="bg-white p-3 border rounded"><%= lesson.content || "" %></pre>
+
+  <div class="alert alert-secondary">
+    <strong>Opens:</strong> <%= lesson.opensText || 'Immediately' %> - <strong>Closes:</strong> <%= lesson.closesText || 'Stays open' %>
+  </div>
+
+  <% if (!canViewContent) { %>
+    <div class="alert alert-warning">
+      <% if (lockInfo && lockInfo.reason === 'before' && lesson.opensText) { %>
+        This lesson unlocks at <%= lesson.opensText %>.
+      <% } else if (lockInfo && lockInfo.reason === 'after' && lesson.closesText) { %>
+        This lesson closed at <%= lesson.closesText %>.
+      <% } else { %>
+        This lesson is currently unavailable.
+      <% } %>
+    </div>
+  <% } %>
+
+  <% if (canViewContent) { %>
+    <pre class="bg-white p-3 border rounded"><%= lesson.content || '' %></pre>
+  <% } else { %>
+    <div class="bg-white p-3 border rounded text-muted">Content unavailable outside the access window.</div>
+  <% } %>
 </div>
 
 <%- include('partials/footer') %>
+
