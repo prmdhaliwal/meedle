@@ -1,0 +1,86 @@
+<%- include('partials/header') %>
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Assign Lessons to Classes</title>
+        <link href="/bootstrap.min.css" rel="stylesheet"/>
+    </head>
+
+    <body class="bg-light">
+        <main>
+            <div class="album p-3 mb-5 bg-primary">
+                <h1 class="text-center text-white">
+                    Manage Lessons - <%= (c && c.course && c.course.code) ? c.course.code : "" %> - <%= c.title %>
+                </h1>
+            </div>
+
+            <div class="container" style="max-width: 980px;">
+                <a href="/instructor/classes" class="btn btn-link p-0 mb-3">
+                    &larr; Back To All Classes
+                </a>
+
+                <% if (msg) { %>
+                    <div class="alert alert-info"><%= msg %></div>
+                <% } %>
+
+                <!--Show list of assigned lessons-->
+                <div class="row">
+                    <div class="col-12 col-lg-6 mb-4">
+                        <h2 class="h5">Assigned Lessons</h2>
+                        <div class="list-group">
+                            <% if (!assignedLessons || !assignedLessons.length) { %>
+                                <div class="list-group-item text-muted">No lessons assigned yet.</div>
+                                <% } else { %>
+                                    <% assignedLessons.forEach(function(l){ %>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong><%= l.title %></strong>
+                                        <% if (l.description) { %>
+                                            <div class="small text-muted"><%= l.description %></div>
+                                        <% } %>
+                                    </div>
+                                    <form method="post" action="/instructor/classes/<%= c._id %>/unassign" class="m-0">
+                                        <input type="hidden" name="lessonId" value="<%= l._id %>" />
+                                        <button class="btn btn-outline-danger btn-sm" type="submit">Unassign</button>
+                                    </form>                           
+
+                        </div>
+                        <% }) %>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+                <!--Show list of classes that could also be assigned-->
+                <div class="col-12 col-lg-6 mb-4">
+                    <h2 class="h5">Available Lessons</h2>
+                    <div class="list-group">
+                        <% if (!availableLessons || !availableLessons.length) { %>
+                            <div class="list-group-item text-muted">No available lessons.</div>
+                        <% } else { %>
+                            <% availableLessons.forEach(function(l){ %>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong><%= l.title %></strong>
+                                        <% if (l.description) { %>
+                                            <div class="small text-muted"><%= l.description %></div>
+                                            <% } %>
+                                    </div>
+                                <form method="post" action="/instructor/classes/<%= c._id %>/assign" class="m-0">
+                                    <input type="hidden" name="lessonId" value="<%= l._id %>"/>
+                                    <button class="btn btn-outline-primary btn-sm" type="submit">Assign</button>
+                                </form>
+                                </div>
+                                <% }) %>
+                                <% } %>
+                    </div>
+                </div>
+        </div>
+        </main>
+    </body>
+</html>
+
+<%- include ('partials/footer') %>

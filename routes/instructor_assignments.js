@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 require("../models/assignments"); 
 const Assignment = require("../models/assignments");
-const Lesson = require("../models/lesson");
+const { Lesson } = require("../models/lesson");
 const constants = require("constants");
 
 // check for login
