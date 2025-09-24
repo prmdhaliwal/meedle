@@ -50,9 +50,11 @@ router.post("/instructor/assignments-edit", requireLogin, requireRole("teacher")
     // validate input
     if (!title || !body || !weighting || !lessonId) {
       const assignments = await Assignment.find({ teacher: global.currentUser._id }).lean();
+      const lessons = await Lesson.find({}).lean();
       return res.render("assignments-edit", {
         user: global.currentUser,
         assignments,
+        lessons,
         error: "All fields are required.",
         created: false,
       });
@@ -84,7 +86,8 @@ router.post("/instructor/assignments-edit", requireLogin, requireRole("teacher")
       });
     }
     const assignments = await Assignment.find({}).lean();
-    return res.render("assignments-edit", { user: global.currentUser, assignments, error: "Could not create assignment.", created: false });
+    const lessons = await Lesson.find({}).lean();
+    return res.render("assignments-edit", { user: global.currentUser, assignments, lessons, error: "Could not create assignment.", created: false });
   }
 });
 
@@ -146,6 +149,7 @@ router.post("/instructor/assignments-edit/:id", requireLogin, requireRole("teach
   try {
     const { title, body, weighting, lessonId } = req.body;
     const assignment = await Assignment.findOne({ _id: new ObjectId(req.params.id) }).lean();
+    const lessons = await Lesson.find({}).lean();
 
     // Validate input
     if (!title || !body || !weighting || !lessonId) {
@@ -153,6 +157,7 @@ router.post("/instructor/assignments-edit/:id", requireLogin, requireRole("teach
       
       return res.render("assignments-edit", {
         user: global.currentUser,
+        lessons,
         assignment: {...assignment, ...req.body},
         error: "All fields are required."
       });
