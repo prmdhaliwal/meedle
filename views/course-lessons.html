@@ -1,7 +1,7 @@
 <%- include('partials/header') %>
 
 <div class="album p-3 mb-5 bg-primary">
-  <h1 class="text-center text-white"><%= course.code %> — <%= course.title %></h1>
+  <h1 class="text-center text-white"><%= course.code %> - <%= course.title %></h1>
 </div>
 
 <div class="container" style="max-width: 800px;">
@@ -32,19 +32,47 @@
     <div class="alert alert-secondary">No lessons available for this course yet.</div>
   <% } else { %>
     <div class="list-group">
-      <% lessons.forEach(function(lesson){ %>
-        <a href="/lessons/<%= lesson._id %>" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-          <div>
+      <% lessons.forEach(function(lesson){
+        const preview = (lesson.content || "").slice(0,150);
+        const moreText = (lesson.content && lesson.content.length > 150) ? "..." : "";
+      %>
+        <% if (lesson.isLocked) { %>
+          <div class="list-group-item">
             <h5 class="mb-1"><%= lesson.title %></h5>
-            <p class="mb-0 text-muted"><%= (lesson.content || "").slice(0,150) %><%= (lesson.content && lesson.content.length > 150) ? "…" : "" %></p>
+            <p class="mb-1 text-muted"><%= preview %><%= moreText %></p>
+            <p class="mb-0 text-muted small">
+              <% if (lesson.lockInfo && lesson.lockInfo.reason === 'before' && lesson.opensText) { %>
+                Opens at <%= lesson.opensText %>
+              <% } else if (lesson.lockInfo && lesson.lockInfo.reason === 'after' && lesson.closesText) { %>
+                Closed at <%= lesson.closesText %>
+              <% } else { %>
+                Currently unavailable
+              <% } %>
+            </p>
           </div>
-          <% if (lesson.isCompleted) { %>
-            <span class="badge bg-success">Completed</span>
-          <% } %>
-        </a>
+        <% } else { %>
+          <a href="/lessons/<%= lesson._id %>" class="list-group-item list-group-item-action">
+            <h5 class="mb-1"><%= lesson.title %></h5>
+            <p class="mb-1 text-muted"><%= preview %><%= moreText %></p>
+            <p class="mb-0 text-muted small">
+              <% if (lesson.opensText) { %>
+                Opened at <%= lesson.opensText %>
+              <% } else { %>
+                Open now
+              <% } %>
+              -
+              <% if (lesson.closesText) { %>
+                Closes at <%= lesson.closesText %>
+              <% } else { %>
+                Stays open
+              <% } %>
+            </p>
+          </a>
+        <% } %>
       <% }) %>
     </div>
   <% } %>
 </div>
 
 <%- include('partials/footer') %>
+
