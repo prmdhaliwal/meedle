@@ -1,7 +1,8 @@
 <%- include('partials/header') %>
 
 <div class="album p-3 mb-5">
-  <h1 class="text-center text-dark">Lesson</h1>
+  <% const currentLesson = (typeof lesson !== 'undefined' && lesson) ? lesson : {}; %>
+  <h1 class="text-center text-dark"><%= currentLesson._id ? 'Edit Lesson' : 'Create Lesson' %></h1>
 </div>
 
 <div class="container" style="max-width: 800px;">
@@ -13,28 +14,26 @@
     <div class="alert alert-success">Lesson created!</div>
   <% } %>
 
-  <% if (typeof updated !== 'undefined' && updated) { %>
-    <div class="alert alert-success">Lesson updated!</div>
+  <% let selectedCourse = ''; %>
+  <% if (currentLesson.course) { %>
+    <% if (typeof currentLesson.course === 'object' && currentLesson.course._id) { %>
+      <% selectedCourse = currentLesson.course._id.toString(); %>
+    <% } else { %>
+      <% selectedCourse = currentLesson.course.toString(); %>
+    <% } %>
   <% } %>
+  <% const formAction = currentLesson._id ? `/instructor/lessons/edit/${currentLesson._id}` : '/instructor/lessons'; %>
+  <% const openValue = currentLesson.availableFrom || ""; %>
+  <% const closeValue = currentLesson.availableUntil || ''; %>
 
-  <form method="POST" action="<%= (typeof lesson != 'undefined' && lesson) ? `/instructor/lessons/edit/${lesson._id}` : '/instructor/lessons' %>">
+  <form method="POST" action="<%= formAction %>">
     <!-- Course dropdown -->
     <div class="mb-3">
       <label class="form-label">Course</label>
       <select class="form-select" name="courseId" required>
-        <option value="" disabled selected>Select a course</option>
+        <option value="" disabled <%= selectedCourse ? '' : 'selected' %>>Select a course</option>
         <% (courses || []).forEach(function(c){ %>
-          <option value="<%= c._id %>" 
-            <% if (typeof lesson !== 'undefined' && lesson && lesson.course) { %>
-              <% if (typeof lesson.course === 'object') { %>
-                <%= lesson.course._id.toString() === c._id.toString() ? 'selected' : '' %>
-              <% } else { %>
-                <%= lesson.course.toString() === c._id.toString() ? 'selected' : '' %>
-              <% } %>
-            <% } %>
-          >
-            <%= c.code %> — <%= c.title %>
-          </option>
+          <option value="<%= c._id %>" <%= (selectedCourse && selectedCourse === c._id.toString()) ? 'selected' : '' %>><%= c.code %> - <%= c.title %></option>
         <% }) %>
       </select>
     </div>
@@ -42,18 +41,30 @@
     <!-- Lesson title -->
     <div class="mb-3">
       <label class="form-label">Lesson title</label>
-      <input type="text" class="form-control" name="title" required
-      value="<%= (typeof lesson !== 'undefined' && lesson) ? lesson.title : '' %>"
-      />
+      <input type="text" class="form-control" name="title" value="<%= currentLesson.title || '' %>" required />
     </div>
 
     <!-- Lesson content -->
     <div class="mb-3">
       <label class="form-label">Content</label>
-      <textarea class="form-control" name="content" rows="8" placeholder="Write lesson content here..." required><% if (typeof lesson !== 'undefined' && lesson) { %><%= lesson.content %><% } %></textarea>
+      <textarea class="form-control" name="content" rows="8" placeholder="Write lesson content here..." required><%= currentLesson.content || '' %></textarea>
     </div>
 
-    <% if (typeof lesson !== 'undefined' && lesson) { %>
+    <!-- Access window -->
+    <div class="mb-4 border rounded-3 p-3 bg-light">
+      <h5 class="mb-3">Access window</h5>
+      <div class="mb-3">
+        <label class="form-label">Opens at</label>
+        <input type="datetime-local" class="form-control" name="availableFrom" value="<%= openValue %>" />
+        <div class="form-text">Leave blank to open straight away.</div>
+      </div>
+      <div class="mb-0">
+        <label class="form-label">Closes at</label>
+        <input type="datetime-local" class="form-control" name="availableUntil" value="<%= closeValue %>" />
+        <div class="form-text">Leave blank to keep the lesson open.</div>
+      </div>
+    </div>
+    <% if (currentLesson._id) { %>
       <button type="submit" class="btn btn-primary">Update Lesson</button>
     <% } else { %>
       <button type="submit" class="btn btn-primary">Create Lesson</button>
@@ -62,3 +73,4 @@
 </div>
 
 <%- include('partials/footer') %>
+
