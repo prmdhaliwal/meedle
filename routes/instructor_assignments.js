@@ -27,11 +27,13 @@ router.get("/instructor/assignments-edit", requireLogin, requireRole("teacher"),
   try {
     // get assignments 
     const assignments = await Assignment.find({}).lean();
+    const lessons = await Lesson.find({}).lean();
 
     res.render("assignments-edit", {
       user: global.currentUser,
       assignments, 
       created: false, 
+      lessons,
     });
   } catch (err) {
     console.error(err);
@@ -67,7 +69,7 @@ router.post("/instructor/assignments-edit", requireLogin, requireRole("teacher")
 
     await assignment.save();
 
-    return res.redirect("/instructor/assignments-edit?msg=Assignment%20added");
+    return res.redirect("/instructor/assignments?msg=Assignment%20added");
   } catch (err) {
     console.error(err);
 
@@ -86,21 +88,104 @@ router.post("/instructor/assignments-edit", requireLogin, requireRole("teacher")
   }
 });
 
-//delete assignment (WIP)
-// router.post("/delete", requireLogin, requireRole("teacher"), async (req, res) => {
-//   try{
-//     const me = global.currentUser;
-//     const {assignmentId} = req.body;
+router.get("/instructor/assignments", requireLogin, requireRole("teacher"), async (req, res) => {
+  try {
+    // get assignments, could change to get only teacher's created assignments
+    const assignments = await Assignment.find({}).lean();
+    const lessons = await Lesson.find({}).lean();
 
-//     await Assignment.deleteOne({_id: new ObjectId(assignmentId), student: me._id});
+    console.log("Assignments fetched:", assignments);
+    res.render("assignments", {
+      assignments, 
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while loading the assignments.");
+  }
+});
 
-//     return res.redirect ("/instructor/assignments?msg=Assignment%20deleted");
-//   } catch (err) {
-//     console.error(err);
-//     return res.redirect("/instructor/assignments?msg=Error%20deleting%20assignment");
+const { ObjectId } = require("mongodb");
 
-//   }
-// });
+// delete assignment
+router.post("/instructor/assignments-delete/:id", requireLogin, requireRole("teacher"), async (req, res) => {
+  try {
+    const assignment = await Assignment.deleteOne({ _id: req.params.id });
+
+    
+    if (assignment.deletedCount === 0) {
+      return res.redirect("/instructor/assignments?msg=Assignment%20not%20found");
+    }
+
+    return res.redirect("/instructor/assignments?msg=Assignment%20deleted");
+  } catch (err) {
+    console.error(err);
+    return res.redirect("/instructor/assignments?msg=Error%20deleting%20assignment");
+  }
+});
+
+// GET route to show edit form
+router.get("/instructor/assignments-edit/:id", requireLogin, requireRole("teacher"), async (req, res) => {
+  try {
+    const lessons = await Lesson.find({}).lean();
+    const assignment = await Assignment.findById(req.params.id).lean();
+    
+    if (!assignment) {
+      return res.redirect("/instructor/assignments?error=Assignment not found");
+    }
+    
+    res.render("assignments-edit", {
+      user: global.currentUser,
+      assignment, 
+      lessons
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while loading the form.");
+  }
+});
+
+// POST route to update an assignment
+router.post("/instructor/assignments-edit/:id", requireLogin, requireRole("teacher"), async (req, res) => {
+  try {
+    const { title, body, weighting, lessonId } = req.body;
+    const assignment = await Assignment.findOne({ _id: new ObjectId(req.params.id) }).lean();
+
+    // Validate input
+    if (!title || !body || !weighting || !lessonId) {
+      const lessons = await Lesson.find({}).lean();
+      
+      return res.render("assignments-edit", {
+        user: global.currentUser,
+        assignment: {...assignment, ...req.body},
+        error: "All fields are required."
+      });
+    }
+
+    // Update the assignment
+    const result = await Assignment.updateOne(
+      { 
+        _id: req.params.id
+      },
+      { $set: { title, body, weighting, lessonId } }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.redirect("/instructor/assignments?error=Assignment not found");
+    }
+
+    return res.redirect("/instructor/assignments?msg=Assignment updated successfully");
+  } catch (err) {
+    console.error(err);
+    
+    const lessons = await Lesson.find({}).lean();
+    return res.render("assignments-edit", { 
+      user: global.currentUser, 
+      lessons, 
+      error: "Could not update assignment.", 
+      assignment: req.body
+    });
+  }
+});
 
 
 module.exports = router;
