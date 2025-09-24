@@ -29,7 +29,6 @@ router.get("/instructor/assignments-edit", requireLogin, requireRole("teacher"),
     const assignments = await Assignment.find({}).lean();
     const lessons = await Lesson.find({}).lean();
 
-    console.log("Lessons fetched", lessons);
 
     res.render("assignments-edit", {
       user: global.currentUser,
