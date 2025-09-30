@@ -35,6 +35,11 @@
                       Assign Lesson
                     </a>
 
+                    <a class="btn btn-outline-primary btn-sm"
+                      href="/instructor/classes/<%= c._id %>/assign-students">
+                      Assign Students
+                    </a>
+
                     <% if (typeof countMap !== "undefined") { %>
                       <span class="badge bg-secondary">
                         <%= countMap.get(String(c._id)) || 0 %> lesson(s)

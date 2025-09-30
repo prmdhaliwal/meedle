@@ -1,0 +1,85 @@
+<%- include('partials/header') %>
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Assign Students to Classes</title>
+        <link href="/bootstrap.min.css" rel="stylesheet"/>
+    </head>
+
+    <body class="bg-light">
+        <main>
+            <div class="album p-3 mb-5 ">
+                <h1 class="text-center ">
+                    Manage Students<%= (c && c.course && c.course.code) ? c.course.code : "" %> - <%= c.title %>
+                </h1>
+            </div>
+
+            <div class="container" style="max-width: 980px;">
+                <a href="/instructor/classes" class="btn btn-link p-0 mb-3">
+                    &larr; Back To All Classes
+                </a>
+
+            
+
+                <!--Show list of assigned students-->
+                <div class="row">
+                    <div class="col-12 col-lg-6 mb-4">
+                        <h2 class="h5">Student List</h2>
+                        <div class="list-group">
+                            <% if (!assignedStudents || !assignedStudents.length) { %>
+                                <div class="list-group-item text-muted">No students assigned yet.</div>
+                                <% } else { %>
+                                    <% assignedStudents.forEach(function(s){ %>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong><%= s.name %></strong>
+                                        <div class="small text-muted"><%= s.email %></div>
+                                    </div>
+                                    <form method="post" action="/instructor/classes/<%= c._id %>/unassign-students" class="m-0">
+                                        <input type="hidden" name="studentId" value="<%= s._id %>" />
+                                        <button class="btn btn-outline-danger btn-sm" type="submit">Unassign</button>
+                                    </form>    
+                                
+
+
+                        </div>
+                        <% }) %>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Available students  -->
+                <div class="row">
+                    <div class="col-12 col-lg-6 mb-4">
+                        <h2 class="h5">Available students</h2>
+                        <div class="list-group">
+                            <% if (!availableStudents || !availableStudents.length) { %>
+                                <div class="list-group-item text-muted">No available students.</div>
+                                <% } else { %>
+                                    <% availableStudents.forEach(function(s){ %>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong><%= s.name %></strong>
+                                        <div class="small text-muted"><%= s.email %></div>
+                                    </div>
+                                    <form method="post" action="/instructor/classes/<%= c._id %>/assign-students" class="m-0">
+                                        <input type="hidden" name="studentId" value="<%= s._id %>" />
+                                        <button class="btn btn-outline-primary btn-sm" type="submit">Assign</button>
+                                    </form>  
+                        </div>
+                        <% }) %>
+                        <% } %>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        </main>
+    </body>
+</html>
+
+<%- include ('partials/footer') %>
