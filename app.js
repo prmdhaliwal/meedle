@@ -81,10 +81,11 @@ app.get("/", async (req, res) => {
       instructorEmail: e.classroom?.instructor?.email || ""
     }));
   } catch (err) {
-    res.send("ERROR")
+    console.error("Failed to load enrolled classes", err);
+    return res.status(500).send("ERROR");
   }
 
-  return res.render("index", { myClasses});
+  return res.render("index", { myClasses });
 
 });   
 
@@ -98,3 +99,4 @@ app.use("/", assignmentRoutes)
 app.listen(PORT_NUMBER, function(){
     console.log("Listening at http://localhost:" + PORT_NUMBER);
 } );
+
