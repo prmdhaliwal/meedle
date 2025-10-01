@@ -12,7 +12,7 @@ ClassSchema.index({ course: 1, title: 1 }, { unique: true });
 
 const ClassEnrollmentSchema = new Schema({
   student: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  studentclass:   { type: Schema.Types.ObjectId, ref: "Class", required: true }
+  classroom:   { type: Schema.Types.ObjectId, ref: "Class", required: true }
 }, { timestamps: true });
 
 ClassEnrollmentSchema.index({ student: 1, classroom: 1 }, { unique: true });
