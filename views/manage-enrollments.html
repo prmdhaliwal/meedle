@@ -30,7 +30,7 @@
             <% (courses || []).forEach(function(c){ %>
               <% if (enrolledIds && enrolledIds.has(String(c._id))) { anyEnrolled = true; %>
                 <div class="list-group-item d-flex justify-content-between align-items-center">
-                  <div><strong><%= c.code %></strong> — <%= c.title %></div>
+                  <div><strong><%= c.code %></strong> - <%= c.title %></div>
                   <form method="post" action="/student/unenroll" class="m-0">
                     <input type="hidden" name="courseId" value="<%= c._id %>" />
                     <button class="btn btn-outline-danger btn-sm" type="submit">Unenroll</button>
@@ -51,7 +51,7 @@
             <% (courses || []).forEach(function(c){ %>
               <% if (!(enrolledIds && enrolledIds.has(String(c._id)))) { anyAvailable = true; %>
                 <div class="list-group-item d-flex justify-content-between align-items-center">
-                  <div><strong><%= c.code %></strong> — <%= c.title %></div>
+                  <div><strong><%= c.code %></strong> - <%= c.title %></div>
                   <form method="post" action="/student/enroll" class="m-0">
                     <input type="hidden" name="courseCode" value="<%= c.code %>" />
                     <button class="btn btn-outline-primary btn-sm" type="submit">Enroll</button>
