@@ -32,9 +32,7 @@ function makeDraft(body = {}) {
   return {
     course: body.courseId || body.course || "",
     title: body.title || "",
-    content: body.content || "",
-    availableFrom: body.availableFrom || "",
-    availableUntil: body.availableUntil || ""
+    content: body.content || ""
   };
 }
 
@@ -44,31 +42,20 @@ function parseDate(value) {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-function formatForInput(value) {
-  const date = parseDate(value);
-  if (!date) return "";
-
-  const two = (part) => String(part).padStart(2, "0");
-  const year = date.getFullYear();
-  const month = two(date.getMonth() + 1);
-  const day = two(date.getDate());
-  const hours = two(date.getHours());
-  const minutes = two(date.getMinutes());
-
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
-
 function formatForDisplay(value) {
   const date = parseDate(value);
   return date ? date.toLocaleString() : "";
 }
 
-function makeLockInfo(lesson, user) {
+function makeLockInfo(classroom, user) {
+  const opensAt = parseDate(classroom && classroom.availableFrom);
+  const closesAt = parseDate(classroom && classroom.availableUntil);
+
   const info = {
     locked: false,
     reason: "",
-    opensAt: parseDate(lesson.availableFrom),
-    closesAt: parseDate(lesson.availableUntil)
+    opensAt,
+    closesAt
   };
 
   if (!user || user.role !== "student") {
@@ -77,10 +64,10 @@ function makeLockInfo(lesson, user) {
 
   const now = new Date();
 
-  if (info.opensAt && now < info.opensAt) {
+  if (opensAt && now < opensAt) {
     info.locked = true;
     info.reason = "before";
-  } else if (info.closesAt && now > info.closesAt) {
+  } else if (closesAt && now > closesAt) {
     info.locked = true;
     info.reason = "after";
   }
@@ -96,7 +83,7 @@ router.get("/instructor/lessons/new", requireLogin, requireRole("teacher"), asyn
 
 router.post("/instructor/lessons", requireLogin, requireRole("teacher"), async (req, res) => {
   try {
-    const { courseId, title, content, availableFrom, availableUntil } = req.body;
+    const { courseId, title, content } = req.body;
 
     if (!courseId || !title || !content) {
       const courses = await Course.find({}).lean();
@@ -109,47 +96,10 @@ router.post("/instructor/lessons", requireLogin, requireRole("teacher"), async (
       });
     }
 
-    let openAt = parseDate(availableFrom);
-    if (availableFrom && !openAt) {
-      const courses = await Course.find({}).lean();
-      return res.render("lesson-new", {
-        user: global.currentUser,
-        courses,
-        error: "Please enter a valid open time.",
-        created: false,
-        lesson: makeDraft(req.body)
-      });
-    }
-
-    let closeAt = parseDate(availableUntil);
-    if (availableUntil && !closeAt) {
-      const courses = await Course.find({}).lean();
-      return res.render("lesson-new", {
-        user: global.currentUser,
-        courses,
-        error: "Please enter a valid close time.",
-        created: false,
-        lesson: makeDraft(req.body)
-      });
-    }
-
-    if (openAt && closeAt && closeAt < openAt) {
-      const courses = await Course.find({}).lean();
-      return res.render("lesson-new", {
-        user: global.currentUser,
-        courses,
-        error: "Close time must be after the open time.",
-        created: false,
-        lesson: makeDraft(req.body)
-      });
-    }
-
     const lesson = new Lesson({
       course: courseId,
       title,
-      content,
-      availableFrom: openAt || undefined,
-      availableUntil: closeAt || undefined
+      content
     });
 
     await lesson.save();
@@ -169,19 +119,22 @@ router.get("/courses/:id/lessons", requireLogin, async (req, res) => {
       .sort({ createdAt: 1 })
       .lean();
 
-    // add lock info
-    const decorated = lessons.map((l) => {
-      const info = makeLockInfo(l, global.currentUser);
-      return {
-        ...l,
-        lockInfo: info,
-        isLocked: info.locked,
-        opensText: formatForDisplay(info.opensAt),
-        closesText: formatForDisplay(info.closesAt)
-      };
-    });
+    const classInfo = await Classroom.findOne({ course: course._id })
+      .populate("instructor", "name email")
+      .lean();
 
-    // add completion flags for students
+    const classLock = makeLockInfo(classInfo, global.currentUser);
+    const opensText = formatForDisplay(classLock.opensAt);
+    const closesText = formatForDisplay(classLock.closesAt);
+
+    const decorated = lessons.map((lesson) => ({
+      ...lesson,
+      lockInfo: { ...classLock },
+      isLocked: classLock.locked,
+      opensText,
+      closesText
+    }));
+
     let decoratedWithFlags = decorated;
     if (global.currentUser?.role === "student" && lessons.length > 0) {
       const lessonIds = lessons.map(l => l._id);
@@ -196,15 +149,10 @@ router.get("/courses/:id/lessons", requireLogin, async (req, res) => {
       }));
     }
 
-    // instructor info for the course
-    const classInfo = await Classroom.findOne({ course: course._id })
-      .populate("instructor", "name email")
-      .lean();
-
     return res.render("course-lessons", {
       user: global.currentUser,
       course,
-      lessons: decoratedWithFlags,           // <-- single, correct array
+      lessons: decoratedWithFlags,
       instructor: classInfo?.instructor || null
     });
   } catch (err) {
@@ -220,7 +168,10 @@ router.get("/lessons/:id", requireLogin, async (req, res) => {
     const lesson = await Lesson.findById(req.params.id).populate("course").lean();
     if (!lesson) return res.status(404).send("Lesson not found");
 
-    const lockInfo = makeLockInfo(lesson, global.currentUser);
+    const courseId = lesson.course?._id || lesson.course;
+    const classInfo = await Classroom.findOne({ course: courseId }).lean();
+
+    const lockInfo = makeLockInfo(classInfo, global.currentUser);
     lesson.lockInfo = lockInfo;
     lesson.opensText = formatForDisplay(lockInfo.opensAt);
     lesson.closesText = formatForDisplay(lockInfo.closesAt);
@@ -274,9 +225,7 @@ router.get("/instructor/lessons/edit/:id", requireLogin, requireRole("teacher"),
     const draft = makeDraft({
       courseId: lesson.course,
       title: lesson.title,
-      content: lesson.content,
-      availableFrom: formatForInput(lesson.availableFrom),
-      availableUntil: formatForInput(lesson.availableUntil)
+      content: lesson.content
     });
     draft._id = lesson._id;
     res.render("lesson-new", {
@@ -296,7 +245,7 @@ router.post("/instructor/lessons/edit/:id", requireLogin, requireRole("teacher")
     if (!lesson) {
       return res.redirect("/instructor/lessons/new?msg=Lesson%20not%20found");
     }
-    const { courseId, title, content, availableFrom, availableUntil } = req.body;
+    const { courseId, title, content } = req.body;
     if (!courseId || !title || !content) {
       const courses = await Course.find({}).lean();
       const draft = makeDraft(req.body);
@@ -309,49 +258,9 @@ router.post("/instructor/lessons/edit/:id", requireLogin, requireRole("teacher")
       });
     }
 
-    let openAt = parseDate(availableFrom);
-    if (availableFrom && !openAt) {
-      const courses = await Course.find({}).lean();
-      const draft = makeDraft(req.body);
-      draft._id = req.params.id;
-      return res.render("lesson-new", {
-        user: global.currentUser,
-        courses,
-        lesson: draft,
-        error: "Please enter a valid open time."
-      });
-    }
-
-    let closeAt = parseDate(availableUntil);
-    if (availableUntil && !closeAt) {
-      const courses = await Course.find({}).lean();
-      const draft = makeDraft(req.body);
-      draft._id = req.params.id;
-      return res.render("lesson-new", {
-        user: global.currentUser,
-        courses,
-        lesson: draft,
-        error: "Please enter a valid close time."
-      });
-    }
-
-    if (openAt && closeAt && closeAt < openAt) {
-      const courses = await Course.find({}).lean();
-      const draft = makeDraft(req.body);
-      draft._id = req.params.id;
-      return res.render("lesson-new", {
-        user: global.currentUser,
-        courses,
-        lesson: draft,
-        error: "Close time must be after the open time."
-      });
-    }
-
     lesson.course = courseId;
     lesson.title = title;
     lesson.content = content;
-    lesson.availableFrom = openAt || undefined;
-    lesson.availableUntil = closeAt || undefined;
 
     await lesson.save();
     return res.redirect("/courses/" + lesson.course + "/lessons");

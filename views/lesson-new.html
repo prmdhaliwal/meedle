@@ -23,9 +23,6 @@
     <% } %>
   <% } %>
   <% const formAction = currentLesson._id ? `/instructor/lessons/edit/${currentLesson._id}` : '/instructor/lessons'; %>
-  <% const openValue = currentLesson.availableFrom || ""; %>
-  <% const closeValue = currentLesson.availableUntil || ''; %>
-
   <form method="POST" action="<%= formAction %>">
     <!-- Course dropdown -->
     <div class="mb-3">
@@ -50,20 +47,6 @@
       <textarea class="form-control" name="content" rows="8" placeholder="Write lesson content here..." required><%= currentLesson.content || '' %></textarea>
     </div>
 
-    <!-- Access window -->
-    <div class="mb-4 border rounded-3 p-3 bg-light">
-      <h5 class="mb-3">Access window</h5>
-      <div class="mb-3">
-        <label class="form-label">Opens at</label>
-        <input type="datetime-local" class="form-control" name="availableFrom" value="<%= openValue %>" />
-        <div class="form-text">Leave blank to open straight away.</div>
-      </div>
-      <div class="mb-0">
-        <label class="form-label">Closes at</label>
-        <input type="datetime-local" class="form-control" name="availableUntil" value="<%= closeValue %>" />
-        <div class="form-text">Leave blank to keep the lesson open.</div>
-      </div>
-    </div>
     <% if (currentLesson._id) { %>
       <button type="submit" class="btn btn-primary">Update Lesson</button>
     <% } else { %>

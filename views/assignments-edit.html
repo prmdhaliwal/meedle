@@ -31,7 +31,7 @@
           <select class="form-select lesson-select" name="lessonId" required>
             <option value="" disabled selected>Select a Lesson</option>
             <% (lessons || []).forEach(function(c){ %>
-              <option value="<%= c._id %>"><%= c.course %> — <%= c.title %></option>
+              <option value="<%= c._id %>"><%= c.course %> - <%= c.title %></option>
             <% }) %>
           </select>
         </div>
