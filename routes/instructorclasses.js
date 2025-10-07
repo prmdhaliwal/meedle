@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { Classroom } = require("../models/class");
+const User = require("../models/User");
+const { Classroom, ClassEnrollment } = require("../models/class");
 
 function requireLogin(req, res, next) {
     if (!global.currentUser) return res.redirect("/auth/login");
@@ -90,5 +91,100 @@ router.post("/classes/:id/access", requireLogin, requireRole("teacher"), async (
         return res.status(500).send("Could not update access window");
     }
 });
+
+router.post("/classes/:id/access", requireLogin, requireRole("teacher"), async (req, res) => {
+    try {
+        const classroom = await Classroom.findById(req.params.id);
+        if (!classroom) {
+            return res.status(404).send("Class not found");
+        }
+
+        const openDate = parseDate(req.body.opensAt);
+        const closeDate = parseDate(req.body.closesAt);
+
+        if (req.body.opensAt && !openDate) {
+            return res.status(400).send("Please enter a valid open time");
+        }
+
+        if (req.body.closesAt && !closeDate) {
+            return res.status(400).send("Please enter a valid close time");
+        }
+
+        if (openDate && closeDate && closeDate < openDate) {
+            return res.status(400).send("Close time must be after the open time");
+        }
+
+        classroom.availableFrom = openDate || null;
+        classroom.availableUntil = closeDate || null;
+        await classroom.save();
+
+        return res.redirect("/instructor/classes");
+    } catch (err) {
+        return res.status(500).send("Could not update access window");
+    }
+});
+
+// get students 
+router.get("/classes/:id/assign-students", requireLogin, requireRole("teacher"), async (req, res) => {
+    try {
+      const classId = req.params.id;
+      const allStudents = await User.find({ role: "student" }).lean();
+      const assignedEnrollments = await ClassEnrollment.find({ classroom: classId }).populate("student").lean();
+
+      const assignedStudents = assignedEnrollments.map(e => e.student);
+      const unavailableEnrollments = await ClassEnrollment.find().populate("student").lean();
+      const unavailableIds = new Set(unavailableEnrollments.map(e => e.student._id.toString()));
+      const availableStudents = allStudents.filter(s => !unavailableIds.has(s._id.toString()));
+  
+      const c = await Classroom.findById(classId).lean();
+  
+      res.render("class-students", {
+        assignedStudents,
+        availableStudents,
+        c
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Error loading students");
+    }
+  });
+
+  // assign a student to a class
+  router.post("/classes/:id/assign-students", requireLogin, requireRole("teacher"), async (req, res) => {
+    try {
+        const classId = req.params.id;
+        const { studentId } = req.body;
+        
+        const exists = await ClassEnrollment.findOne({ student: studentId, studentclass: classId });
+        if (!exists) {
+        await ClassEnrollment.create({ student: studentId, classroom: classId });
+        }
+
+        res.redirect(`/instructor/classes/${classId}/assign-students`);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error assigning student");
+      }
+  });
+
+  // unassign a student to a class
+  router.post("/classes/:id/unassign-students", requireLogin, requireRole("teacher"), async (req, res) => {
+    try {
+        const classId = req.params.id;
+        const { studentId } = req.body;
+        
+        const exists = await ClassEnrollment.findOne({ student: studentId, classroom: classId });
+        if (exists) {
+        await ClassEnrollment.deleteOne({ student: studentId, classroom: classId });
+        }
+
+        res.redirect(`/instructor/classes/${classId}/assign-students`);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error unassigning student");
+      }
+  });
+  
+  
 
 module.exports = router;
