@@ -129,7 +129,7 @@ router.get("/classes/:id/assign-students", requireLogin, requireRole("teacher"),
     try {
       const classId = req.params.id;
       const allStudents = await User.find({ role: "student" }).lean();
-      const assignedEnrollments = await ClassEnrollment.find({ studentclass: classId }).populate("student").lean();
+      const assignedEnrollments = await ClassEnrollment.find({ classroom: classId }).populate("student").lean();
 
       const assignedStudents = assignedEnrollments.map(e => e.student);
       const unavailableEnrollments = await ClassEnrollment.find().populate("student").lean();
@@ -157,7 +157,7 @@ router.get("/classes/:id/assign-students", requireLogin, requireRole("teacher"),
         
         const exists = await ClassEnrollment.findOne({ student: studentId, studentclass: classId });
         if (!exists) {
-        await ClassEnrollment.create({ student: studentId, studentclass: classId });
+        await ClassEnrollment.create({ student: studentId, classroom: classId });
         }
 
         res.redirect(`/instructor/classes/${classId}/assign-students`);
@@ -173,9 +173,9 @@ router.get("/classes/:id/assign-students", requireLogin, requireRole("teacher"),
         const classId = req.params.id;
         const { studentId } = req.body;
         
-        const exists = await ClassEnrollment.findOne({ student: studentId, studentclass: classId });
+        const exists = await ClassEnrollment.findOne({ student: studentId, classroom: classId });
         if (exists) {
-        await ClassEnrollment.deleteOne({ student: studentId, studentclass: classId });
+        await ClassEnrollment.deleteOne({ student: studentId, classroom: classId });
         }
 
         res.redirect(`/instructor/classes/${classId}/assign-students`);
