@@ -40,7 +40,7 @@
           <select class="form-select lesson-select" name="lessonId" required>
             <option value="" disabled <%= (typeof assignment === 'undefined' || !assignment) ? 'selected' : '' %>>Select a Lesson</option>
             <% (lessons || []).forEach(function(c){ %>
-              <option value="<%= c._id %>"><%= c.course %> - <%= c.title %></option>
+              <option value="<%= c._id %>"><%= c.course.code %> - <%= c.title %></option>
             <% }) %>
           </select>
         </div>
