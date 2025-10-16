@@ -73,11 +73,9 @@ router.post("/:classId/assign", requireLogin, requireRole("teacher"), async (req
                           encodeURIComponent("Lesson not found for this unit"));
         }
 
-        await ClassLesson.updateOne(
-            { classroom: classId, lesson: lessonId},
-            { $setOnInsert: { classroom: classId, lesson: lessonId } },
-            { upsert: true }
-        );
+        await ClassLesson.deleteMany({ classroom: classId });
+
+        await ClassLesson.create({ classroom: classId, lesson: lessonId });
 
         res.redirect(`/instructor/classes/${classId}/assign-lesson?msg=` +
                  encodeURIComponent("Lesson assigned"));

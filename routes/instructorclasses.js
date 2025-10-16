@@ -128,6 +128,7 @@ router.post("/classes/:id/access", requireLogin, requireRole("teacher"), async (
 router.get("/classes/:id/assign-students", requireLogin, requireRole("teacher"), async (req, res) => {
     try {
       const classId = req.params.id;
+      const user = global.currentUser;
       const allStudents = await User.find({ role: "student" }).lean();
       const assignedEnrollments = await ClassEnrollment.find({ classroom: classId }).populate("student").lean();
 
@@ -141,7 +142,8 @@ router.get("/classes/:id/assign-students", requireLogin, requireRole("teacher"),
       res.render("class-students", {
         assignedStudents,
         availableStudents,
-        c
+        c,
+        user
       });
     } catch (err) {
       console.error(err);
