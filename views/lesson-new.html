@@ -2,7 +2,7 @@
 
 <div class="album p-3 mb-5">
   <% const currentLesson = (typeof lesson !== 'undefined' && lesson) ? lesson : {}; %>
-  <h1 class="text-center text-dark"><%= currentLesson._id ? 'Edit Lesson' : 'Create Lesson' %></h1>
+  <h1 class="text-center"><%= currentLesson._id ? 'Edit Lesson' : 'Create Lesson' %></h1>
 </div>
 
 <div class="container" style="max-width: 800px;">
@@ -46,7 +46,7 @@
       <label class="form-label">Content</label>
       <textarea class="form-control" name="content" rows="8" placeholder="Write lesson content here..." required><%= currentLesson.content || '' %></textarea>
     </div>
-
+    <a href="/instructor/lessons-overview" class="btn btn-secondary ms-2">Manage Lessons</a>
     <% if (currentLesson._id) { %>
       <button type="submit" class="btn btn-primary">Update Lesson</button>
     <% } else { %>

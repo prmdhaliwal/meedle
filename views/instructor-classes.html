@@ -9,7 +9,7 @@
         <link href="/bootstrap.min.css" rel="stylesheet"/>
     </head>
 
-    <body class="bg-light">
+    <body>
         <main>
             <div class="album p-3 mb-5">
                 <h1 class="text-center">Classes</h1>
@@ -33,7 +33,7 @@
                     <p class="mb-1 small"><strong>Access window</strong></p>
                     <p class="mb-1 small">Opens: <%= c.availableFromText || "Immediately" %></p>
                     <p class="mb-2 small">Closes: <%= c.availableUntilText || "No close time" %></p>
-                    <form method="POST" action="/instructor/classes/<%= c._id %>/access" class="border rounded p-2 bg-light">
+                    <form method="POST" action="/instructor/classes/<%= c._id %>/access" class="border rounded p-2">
                       <div class="mb-2">
                         <label class="form-label mb-1">Opens at</label>
                         <input type="datetime-local" class="form-control form-control-sm" name="opensAt" value="<%= c.availableFromInput %>" />
