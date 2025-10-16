@@ -1,0 +1,74 @@
+<%- include('partials/header') %>
+
+<div class="container mt-4">
+    <% if (user && user.role === 'student') { %>
+        <!-- Student View -->
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center">Reports Page</h1>
+            </div>
+        </div>
+    <% } else if (user && user.role === 'teacher') { %>
+        <!-- Teacher View -->
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-4">System Reports</h1>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card text-white bg-primary">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-people-fill"></i> Total Students
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <h2 class="card-text display-4"><%= studentCount || 0 %></h2>
+                        <p class="card-text">Students in the system</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card text-white bg-success">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-book-fill"></i> Total Courses
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <h2 class="card-text display-4"><%= courseCount || 0 %></h2>
+                        <p class="card-text">Courses available</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card text-white bg-info">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-journal-text"></i> Total Classes
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <h2 class="card-text display-4"><%= classCount || 0 %></h2>
+                        <p class="card-text">Active classes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } else { %>
+        <!-- Not logged in or invalid role -->
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-warning" role="alert">
+                    Please log in to view reports.
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<%- include('partials/footer') %>

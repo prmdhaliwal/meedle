@@ -22,6 +22,7 @@ const authRoutes = require("./routes/auth");
 const lessonRoutes = require("./routes/lessons");
 const assignmentRoutes = require("./routes/instructor_assignments");
 const submissionRouter = require('./routes/submission_page');
+const reportsRoutes = require("./routes/reports");
 
 //References to the static assets
 app.use(express.static("node_modules/bootstrap/dist/css"));
@@ -133,6 +134,7 @@ app.get("/", async (req, res) => {
 app.use("/auth", authRoutes); 
 app.use("/", lessonRoutes)
 app.use("/", assignmentRoutes)
+app.use("/", reportsRoutes)
 
 app.listen(PORT_NUMBER, function(){
     console.log("Listening at http://localhost:" + PORT_NUMBER);
