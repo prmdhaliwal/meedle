@@ -129,15 +129,19 @@ router.get("/classes/:id/assign-students", requireLogin, requireRole("teacher"),
     try {
       const classId = req.params.id;
       const user = global.currentUser;
+      
+      // Get all students
       const allStudents = await User.find({ role: "student" }).lean();
+      
+      // Get students already assigned to THIS specific class
       const assignedEnrollments = await ClassEnrollment.find({ classroom: classId }).populate("student").lean();
-
       const assignedStudents = assignedEnrollments.map(e => e.student);
-      const unavailableEnrollments = await ClassEnrollment.find().populate("student").lean();
-      const unavailableIds = new Set(unavailableEnrollments.map(e => e.student._id.toString()));
-      const availableStudents = allStudents.filter(s => !unavailableIds.has(s._id.toString()));
+      
+      // Get students available (not enrolled in THIS class)
+      const assignedStudentIds = new Set(assignedStudents.map(s => s._id.toString()));
+      const availableStudents = allStudents.filter(s => !assignedStudentIds.has(s._id.toString()));
   
-      const c = await Classroom.findById(classId).lean();
+      const c = await Classroom.findById(classId).populate('course').lean();
   
       res.render("class-students", {
         assignedStudents,
