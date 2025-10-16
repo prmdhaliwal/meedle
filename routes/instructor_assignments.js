@@ -27,7 +27,9 @@ router.get("/instructor/assignments-edit", requireLogin, requireRole("teacher"),
   try {
     // get assignments 
     const assignments = await Assignment.find({}).lean();
-    const lessons = await Lesson.find({}).lean();
+    const lessons = await Lesson.find({}).lean().populate(
+      {path: 'course'}
+    );;
 
 
     res.render("assignments-edit", {
@@ -49,7 +51,9 @@ router.post("/instructor/assignments-edit", requireLogin, requireRole("teacher")
     // validate input
     if (!title || !body || !weighting || !lessonId) {
       const assignments = await Assignment.find({ teacher: global.currentUser._id }).lean();
-      const lessons = await Lesson.find({}).lean();
+      const lessons = await Lesson.find({}).lean().populate(
+      {path: 'course'}
+    );;
       return res.render("assignments-edit", {
         user: global.currentUser,
         assignments,
@@ -94,7 +98,9 @@ router.get("/instructor/assignments", requireLogin, requireRole("teacher"), asyn
   try {
     // get assignments, could change to get only teacher's created assignments
     const assignments = await Assignment.find({}).lean();
-    const lessons = await Lesson.find({}).lean();
+    const lessons = await Lesson.find({}).lean().populate(
+      {path: 'course'}
+    );
 
     res.render("assignments", {
       assignments, 
@@ -126,7 +132,7 @@ router.post("/instructor/assignments-delete/:id", requireLogin, requireRole("tea
 // GET route to show edit form
 router.get("/instructor/assignments-edit/:id", requireLogin, requireRole("teacher"), async (req, res) => {
   try {
-    const lessons = await Lesson.find({}).lean();
+    const lessons = await Lesson.find({}).lean().populate({path: 'course'});
     const assignment = await Assignment.findById(req.params.id).lean();
     
     if (!assignment) {
@@ -148,11 +154,11 @@ router.post("/instructor/assignments-edit/:id", requireLogin, requireRole("teach
   try {
     const { title, body, weighting, lessonId } = req.body;
     const assignment = await Assignment.findOne({ _id: new ObjectId(req.params.id) }).lean();
-    const lessons = await Lesson.find({}).lean();
+    const lessons = await Lesson.find({}).lean().populate({path: 'course'});
 
     // Validate input
     if (!title || !body || !weighting || !lessonId) {
-      const lessons = await Lesson.find({}).lean();
+      const lessons = await Lesson.find({}).lean().populate({path: 'course'});
       
       return res.render("assignments-edit", {
         user: global.currentUser,
@@ -177,7 +183,7 @@ router.post("/instructor/assignments-edit/:id", requireLogin, requireRole("teach
     return res.redirect("/instructor/assignments?msg=Assignment updated successfully");
   } catch (err) {
     
-    const lessons = await Lesson.find({}).lean();
+    const lessons = await Lesson.find({}).lean().populate({path: 'course'});
     return res.render("assignments-edit", { 
       user: global.currentUser, 
       lessons, 

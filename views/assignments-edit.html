@@ -11,34 +11,53 @@
   <% if (typeof created !== 'undefined' && created) { %>
     <div class="alert alert-success">Assignment created</div>
   <% } %>
+
+  <% if (typeof updated !== 'undefined' && updated) { %>
+    <div class="alert alert-success">Assignment updated successfully</div>
+  <% } %>
   
-  <form method="POST" action="/instructor/assignments-edit">
+  <form method="POST" action="<%= (typeof assignment !== 'undefined' && assignment) ? '/instructor/assignments-edit/' + assignment._id : '/instructor/assignments-edit' %>">
         <!-- assignment form -->
         <div class="mb-3">
-            <label class="form-label">Assignment Title</label>
-            <input type="text" name="title" class="form-control" required placeholder="Enter assignment title">
+          <label class="form-label">Assignment Title</label>
+          <input type="text" name="title" class="form-control" required 
+                placeholder="Enter assignment title" 
+                value="<%= (typeof assignment !== 'undefined' && assignment) ? assignment.title : '' %>">
         </div>
         <div class="mb-3">
-            <label class="form-label">Body</label>
-            <textarea type="text" name="body" class="form-control" rows="8" required placeholder="Enter assignment body"></textarea>
+          <label class="form-label">Body</label>
+          <textarea type="text" name="body" class="form-control" rows="8" required 
+                    placeholder="Enter assignment body"><%= (typeof assignment !== 'undefined' && assignment) ? assignment.body : '' %></textarea>
         </div>
         <div class="mb-3">
-            <label class="form-label">Weighting</label>
-            <textarea class="form-control" name="weighting" required placeholder="Enter assignment weighting"></textarea>
+          <label class="form-label">Weighting</label>
+          <input type="number" class="form-control" name="weighting" required 
+                placeholder="Enter assignment weighting (e.g., 10 for 10%)" 
+                value="<%= (typeof assignment !== 'undefined' && assignment) ? assignment.weighting : '' %>">
         </div>
         <div class="mb-3">
           <label class="form-label">Lesson</label>
-          <select class="form-select lesson-select" name="lessonId" required>
-            <option value="" disabled selected>Select a Lesson</option>
-            <% (lessons || []).forEach(function(c){ %>
-              <option value="<%= c._id %>"><%= c.course %> - <%= c.title %></option>
+      <select class="form-select lesson-select" name="lessonId" required>
+        <option value="" disabled>Select a Lesson</option>
+        <% (lessons || []).forEach(function(lesson){ %>
+          <option value="<%= lesson._id %>" 
+                  <%= (typeof assignment !== 'undefined' && assignment && assignment.lessonId && assignment.lessonId.toString() === lesson._id.toString()) ? 'selected' : '' %>>
+            <%= lesson.course.code %> - <%= lesson.title %>
+          </option>
             <% }) %>
           </select>
         </div>
         <a href="/instructor/assignments" class="btn btn-secondary ms-2">Go Back</a>
-        <button type="submit" class="btn btn-primary">Add Assignment</button>
+        <% if (typeof assignment !== 'undefined' && assignment) { %>
+          <button type="submit" class="btn btn-primary">Update Assignment</button>
+        <% } else { %>
+          <button type="submit" class="btn btn-primary">Create Assignment</button>
+        <% } %>
+
         
     </form>
+    
+    
 </div>
 
 
