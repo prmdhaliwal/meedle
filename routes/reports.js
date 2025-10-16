@@ -4,7 +4,6 @@ const User = require("../models/User");
 const Course = require("../models/course");
 const { Classroom } = require("../models/class");
 const Enrollment = require("../models/enrollment");
-const Enrollment = require("../models/enrollment");
 const { Lesson } = require("../models/lesson");
 const LessonCompletion = require("../models/lesson_completion");
 
