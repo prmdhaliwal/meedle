@@ -7,7 +7,7 @@
     <title>Assignments</title>
     <link href="/bootstrap.min.css" rel="stylesheet" />
   </head>
-  <body class="bg-light">
+  <body>
     <main>
 
       <div class="container" style="max-width: 980px;">
@@ -17,7 +17,7 @@
             <%= lessons && lessons.length ? lessons.length : 0 %> lesson<%= (lessons && lessons.length === 1) ? "" : "s" %>
           </div>
           <!-- dead link need to fix -->
-          <a class="btn btn-primary" href="">Manage Lessons</a>
+          <a class="btn btn-primary" href="/instructor/lessons/new">Add New Lesson</a>
         </div>
 
         <!-- Empty state -->
