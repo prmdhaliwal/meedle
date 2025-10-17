@@ -3,11 +3,60 @@
 <div class="container mt-4">
     <% if (user && user.role === 'student') { %>
         <!-- Student View -->
-        <div class="row">
+        <div class="row mb-4">
             <div class="col-12">
-                <h1 class="text-center">Reports Page</h1>
+                <h1 class="text-center mb-3">My Course Progress</h1>
+                <p class="text-muted text-center mb-0">Track how far you've come in each course you are enrolled in.</p>
             </div>
         </div>
+
+        <% if (courseProgress && courseProgress.length > 0) { %>
+            <div class="row g-4">
+                <% courseProgress.forEach(function(course) { %>
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h5 class="card-title mb-1"><%= course.title %></h5>
+                                        <% if (course.totalLessons === 0) { %>
+                                            <p class="card-text text-muted mb-0">Lessons will appear here once published.</p>
+                                        <% } else { %>
+                                            <p class="card-text text-muted mb-0">
+                                                <%= course.completedLessons %> of <%= course.totalLessons %> lessons complete
+                                            </p>
+                                        <% } %>
+                                    </div>
+                                    <span class="badge bg-secondary text-uppercase"><%= course.code %></span>
+                                </div>
+                                <div class="progress" role="progressbar"
+                                     aria-valuenow="<%= course.percentComplete %>"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"
+                                     aria-label="Progress towards course completion">
+                                    <div class="progress-bar <%= course.percentComplete === 100 ? 'bg-success' : '' %>"
+                                         style="width: <%= course.percentComplete %>%;">
+                                        <span class="visually-hidden"><%= course.percentComplete %>% complete</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <span class="text-muted small">Progress</span>
+                                    <span class="fw-semibold small"><%= course.percentComplete %>%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-info" role="alert">
+                        You are not enrolled in any courses yet. Visit the courses page to get started.
+                    </div>
+                </div>
+            </div>
+        <% } %>
     <% } else if (user && user.role === 'teacher') { %>
         <!-- Teacher View -->
         <div class="row">
