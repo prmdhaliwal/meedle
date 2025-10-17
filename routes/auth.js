@@ -33,25 +33,36 @@ router.get("/register", function(req, res) {
 
 // Handle register form submission
 router.post("/register", async function(req, res) {
-    const { name, email, password, gender} = req.body;
+    try {
+        const { name, email, password, gender} = req.body;
+         
+        //check the email is not already registered as a pop up modal
+        const existingUser = await User.findOne({ email });
+
+        if (existingUser) {
+          return res.render('register', { error: 'Email is already registered. Please use a different email.' });
+        }
      
-    //check the email is not already registered as a pop up modal
-    const existingUser = await User.findOne({ email });
+        const newUser = new User({
+          name,
+          email,  
+          password,
+          isAdmin: false, // for simplicity, all new users are not admins until manually changed in MongoDB
+          gender
+        });
 
-    if (existingUser) {
-      return res.render('register', { error: 'Email is already registered. Please use a different email.' });
+        await newUser.save();
+        res.redirect("/auth/login");
+    } catch (error) {
+        // Handle validation errors
+        if (error.name === 'ValidationError') {
+            const passwordError = error.errors.password;
+            if (passwordError) {
+                return res.render('register', { error: passwordError.message });
+            }
+        }
+        return res.render('register', { error: 'Registration failed. Please try again.' });
     }
- 
-    const newUser = new User({
-      name,
-      email,  
-      password,
-      isAdmin: false, // for simplicity, all new users are not admins until manually changed in MongoDB
-      gender
-    });
-
-    await newUser.save();
-    res.redirect("/auth/login");
 });
 
 // ========================================================================================================================================
@@ -62,24 +73,35 @@ router.get("/instructor-set-password", function(req, res) {
 });
 
 router.post("/set-password", async function(req, res) {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
 
-  // If the instructor email exists
-  if (user) {
-    // If the instructor hasn't set a password yet: set password
-    if (!user.password) {
-      user.password = password;
-      user.isAdmin = true; // should already be set but can't hurt to be sure
-      await user.save();
-      return res.render("login", {error: 'Instructor password set successfully! You can now log in.', positive: true});
+    // If the instructor email exists
+    if (user) {
+      // If the instructor hasn't set a password yet: set password
+      if (!user.password) {
+        user.password = password;
+        user.isAdmin = true; // should already be set but can't hurt to be sure
+        await user.save();
+        return res.render("login", {error: 'Instructor password set successfully! You can now log in.', positive: true});
 
-    // Else: If the instructor already has a password
-    } else {
-      return res.render('set-password', { error: 'Password already set' });
+      // Else: If the instructor already has a password
+      } else {
+        return res.render('set-password', { error: 'Password already set' });
+      }
     }
+    res.render("login", {error: 'No instructor email exists'});  
+  } catch (error) {
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+        const passwordError = error.errors.password;
+        if (passwordError) {
+            return res.render('set-password', { error: passwordError.message });
+        }
+    }
+    return res.render('set-password', { error: 'Password setting failed. Please try again.' });
   }
-  res.render("login", {error: 'No instructor email exists'});  
 });
 
 // ========================================================================================================================================  
@@ -100,25 +122,36 @@ router.post("/edit-details", async function(req, res) {
     return res.redirect("/auth/login");
   }
 
-  const { name, email, password, gender } = req.body;
-  let user = await User.findById(global.currentUser._id);
+  try {
+    const { name, email, password, gender } = req.body;
+    let user = await User.findById(global.currentUser._id);
 
-  if (!user) {
-    return res.redirect("/auth/login");
+    if (!user) {
+      return res.redirect("/auth/login");
+    }
+
+    user.name = name;
+    user.email = email;
+    user.password = password;
+    user.gender = gender;
+
+    await user.save();
+
+    // Update the global currentUser variable
+    user = await User.findById(global.currentUser._id);
+    global.setCurrentUser(user);
+
+    res.render("edit-details", {error : "Details updated successfully!"});
+  } catch (error) {
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+        const passwordError = error.errors.password;
+        if (passwordError) {
+            return res.render('edit-details', { user: global.currentUser, error: passwordError.message });
+        }
+    }
+    return res.render('edit-details', { user: global.currentUser, error: 'Update failed. Please try again.' });
   }
-
-  user.name = name;
-  user.email = email;
-  user.password = password;
-  user.gender = gender;
-
-  await user.save();
-
-  // Update the global currentUser variable
-  user = await User.findById(global.currentUser._id);
-  global.setCurrentUser(user);
-
-  res.render("edit-details", {error : "Details updated successfully!"});
 });
 
 // ========================================================================================================================================  
