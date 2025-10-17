@@ -19,7 +19,7 @@
           <div class="text-muted">
             <%= assignments && assignments.length ? assignments.length : 0 %> assignment<%= (assignments && assignments.length === 1) ? "" : "s" %>
           </div>
-          <a class="btn btn-primary" href="/instructor/assignments-edit">Manage Assignments</a>
+          <a class="btn btn-primary" href="/instructor/assignments-edit">Add New Assignment</a>
         </div>
 
         <!-- Empty state -->
@@ -37,11 +37,11 @@
                 <div class="card-body">
                   <h5 class="card-title mb-1"><%= c.title %></h5>
                   <h6 class="card-subtitle mb-1">Weighting: <%= c.weighting %></h5>
-                  <h6 class="card-subtitle mb-1">Lesson ID: <%= c.lessonId %></h5>
+                  <!-- <h6 class="card-subtitle mb-1">Lesson ID: <%= c.lessonId %></h5> -->
                   <p class="card-text text-muted small mb-0"><%= c.body || "" %></p>
 
                   <div class="d-flex justify-content-end gap-2">
-                    <a href="/instructor/assignments-edit/<%= c._id %>" class="btn btn-sm btn-outline-primary">Edit</a>
+                    <a href="/instructor/assignments-edit/<%=c._id%>" class="btn btn-sm btn-outline-primary">Edit</a>
                     <form method="POST" action="/instructor/assignments-delete/<%= c._id %>" 
                         onsubmit="return confirm('Are you sure?');">
                     <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
