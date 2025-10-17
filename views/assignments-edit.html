@@ -47,7 +47,7 @@
             <% }) %>
           </select>
         </div>
-        <a href="/instructor/assignments" class="btn btn-secondary ms-2">Go Back</a>
+        <a href="/instructor/assignments" class="btn btn-secondary ms-2">Manage Assignments</a>
         <% if (typeof assignment !== 'undefined' && assignment) { %>
           <button type="submit" class="btn btn-primary">Update Assignment</button>
         <% } else { %>
@@ -67,7 +67,17 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 
+<style>
+  html[data-bs-theme="dark"] {
+    --bs-body-bg: #212529;
+    --bs-body-color: #f8f9fa;
+  }
 
+  html[data-bs-theme="dark"] .select2-container--bootstrap-5 * {
+    background-color: var(--bs-body-bg) !important;
+    color: var(--bs-body-color) !important;
+  }
+</style>
 <script>
   $(document).ready(function() {
     $('.lesson-select').select2({
