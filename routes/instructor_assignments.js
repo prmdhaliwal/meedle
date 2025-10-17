@@ -27,7 +27,9 @@ router.get("/instructor/assignments-edit", requireLogin, requireRole("teacher"),
   try {
     // get assignments 
     const assignments = await Assignment.find({}).lean();
-    const lessons = await Lesson.find({}).lean();
+    const lessons = await Lesson.find({}).lean().populate(
+      {path: 'course'}
+    );;
 
 
     res.render("assignments-edit", {
@@ -49,7 +51,9 @@ router.post("/instructor/assignments-edit", requireLogin, requireRole("teacher")
     // validate input
     if (!title || !body || !weighting || !lessonId) {
       const assignments = await Assignment.find({ teacher: global.currentUser._id }).lean();
-      const lessons = await Lesson.find({}).lean();
+      const lessons = await Lesson.find({}).lean().populate(
+      {path: 'course'}
+    );;
       return res.render("assignments-edit", {
         user: global.currentUser,
         assignments,

@@ -37,10 +37,13 @@
         </div>
         <div class="mb-3">
           <label class="form-label">Lesson</label>
-          <select class="form-select lesson-select" name="lessonId" required>
-            <option value="" disabled <%= (typeof assignment === 'undefined' || !assignment) ? 'selected' : '' %>>Select a Lesson</option>
-            <% (lessons || []).forEach(function(c){ %>
-              <option value="<%= c._id %>"><%= c.course.code %> - <%= c.title %></option>
+      <select class="form-select lesson-select" name="lessonId" required>
+        <option value="" disabled>Select a Lesson</option>
+        <% (lessons || []).forEach(function(lesson){ %>
+          <option value="<%= lesson._id %>" 
+                  <%= (typeof assignment !== 'undefined' && assignment && assignment.lessonId && assignment.lessonId.toString() === lesson._id.toString()) ? 'selected' : '' %>>
+            <%= lesson.course.code %> - <%= lesson.title %>
+          </option>
             <% }) %>
           </select>
         </div>
