@@ -11,10 +11,6 @@
     <section class="container py-4">
         <h1 class="mb-4">Welcome back, <%= user.name %></h1>
 
-        <div class="d-flex flex-wrap gap-2 mb-4">
-            <a href="/student/courses" class="btn btn-primary">My Courses</a>
-            <a href="/student/manage-enrollments" class="btn btn-outline-primary">Manage Enrollments</a>
-        </div>
 
         <% if (user && user.role === "student") { %>
             <section class="mt-4">
@@ -48,13 +44,6 @@
 
         <% if (user && user.role == "teacher") { %>
             <div class="d-flex flex-wrap gap-2 mt-4">
-                <a href="/instructor/lessons/new" class="btn btn-primary">Create Lesson</a>
-                <a href="/instructor/students" class="btn btn-primary">View All Students</a>
-                <a href="/instructor/classes" class="btn btn-primary">View All Classes</a>
-                <a href="/instructor/assignments-edit" class="btn btn-success">Add New Assignments</a>
-                <a href="/instructor/marking" class="btn btn-success">Student Marking</a>
-                <a href="/instructor/lessons-overview" class="btn btn-outline-primary">Manage Lessons</a>
-                <a href="/instructor/assignments" class="btn btn-outline-primary">Manage Assignments</a>
             </div>
         <% } %>
     </section>
