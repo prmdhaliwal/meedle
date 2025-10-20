@@ -23,12 +23,14 @@ const lessonRoutes = require("./routes/lessons");
 const assignmentRoutes = require("./routes/instructor_assignments");
 const submissionRouter = require('./routes/submission_page');
 const reportsRoutes = require("./routes/reports");
+const markingRoutes = require("./routes/marking");
 
 //References to the static assets
 app.use(express.static("node_modules/bootstrap/dist/css"));
 app.use(express.static("images")); //This one means statics are in images folder. So paths will just be /porsche.jpg for example rather than absolute paths
 // app.use(express.static("scripts"));
 app.use('/submission', submissionRouter);
+app.use("/", markingRoutes);
 
 
 // Configure EJS
@@ -135,6 +137,7 @@ app.use("/auth", authRoutes);
 app.use("/", lessonRoutes)
 app.use("/", assignmentRoutes)
 app.use("/", reportsRoutes)
+app.use("/", markingRoutes);
 
 app.listen(PORT_NUMBER, function(){
     console.log("Listening at http://localhost:" + PORT_NUMBER);

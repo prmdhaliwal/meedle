@@ -1,16 +1,41 @@
-const mongoose = require("mongoose");
-const { Schema, model } = mongoose;
+const mongoose = require('mongoose');
 
-const SubmissionSchema = new Schema(
-  {
-    student:    { type: Schema.Types.ObjectId, ref: "User", required: true },
-    assignment: { type: Schema.Types.ObjectId, ref: "Assignment", required: true },
-    answer:     { type: String, required: true },
-    submittedAt:{ type: Date, default: Date.now }
-  },
-  { timestamps: true }
-);
+const SubmissionSchema = new mongoose.Schema({
+    assignment: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Assignment", 
+        required: true 
+    },
+    student: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "User", 
+        required: true 
+    },
+    marks: { 
+        type: Number, 
+        min: 0, 
+        max: 100,
+        default: null // null means not yet graded
+    },
+    feedback: { 
+        type: String, 
+        default: "" 
+    },
+    submittedAt: { 
+        type: Date, 
+        default: null 
+    },
+    gradedAt: { 
+        type: Date, 
+        default: null 
+    },
+    gradedBy: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "User" 
+    }
+}, { timestamps: true });
 
-SubmissionSchema.index({ student: 1, assignment: 1 }, { unique: true });
+// Unique constraint: one submission per student per assignment
+SubmissionSchema.index({ assignment: 1, student: 1 }, { unique: true });
 
-module.exports = model("Submission", SubmissionSchema);
+module.exports = mongoose.model('Submission', SubmissionSchema);
