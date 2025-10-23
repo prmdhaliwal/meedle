@@ -1,0 +1,92 @@
+<%- include('partials/header') %>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Courses & Classes</title>
+    <link href="/bootstrap.min.css" rel="stylesheet" />
+  </head>
+  <body class="bg-light">
+    <main>
+      <div class="album p-3 mb-5">
+        <h1 class="text-center">Courses & Classes</h1>
+        <p class="text-center text-muted mb-0">
+          Browse every course and the classes linked to it.
+        </p>
+      </div>
+
+      <div class="container" style="max-width: 980px;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <a href="/instructor/classes" class="btn btn-link p-0">&larr; Back to Classes</a>
+          <a href="/" class="btn btn-outline-secondary btn-sm">Dashboard</a>
+        </div>
+
+        <% if (!courses || courses.length === 0) { %>
+          <div class="alert alert-secondary">
+            No courses available yet.
+          </div>
+        <% } %>
+
+        <div class="row g-3">
+          <% (courses || []).forEach(function(course){ %>
+            <div class="col-12">
+              <div class="card shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex flex-wrap justify-content-between gap-2">
+                    <div>
+                      <h4 class="card-title mb-1"><%= course.code %> - <%= course.title %></h4>
+                      <% if (course.description) { %>
+                        <p class="card-text text-muted small mb-2"><%= course.description %></p>
+                      <% } %>
+                    </div>
+                    <span class="badge bg-primary align-self-start">
+                      <%= course.classCount %> class<%= course.classCount === 1 ? "" : "es" %>
+                    </span>
+                  </div>
+
+                  <% if (course.classes && course.classes.length > 0) { %>
+                    <div class="list-group mt-3">
+                      <% course.classes.forEach(function(cls){ %>
+                        <div class="list-group-item">
+                          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <div>
+                              <div class="fw-semibold"><%= cls.title %></div>
+                              <% if (cls.term) { %>
+                                <div class="text-muted small mb-1">Term: <%= cls.term %></div>
+                              <% } %>
+                              <div class="text-muted small">
+                                Instructor: <%= cls.instructorName %>
+                                <% if (cls.instructorEmail) { %>
+                                  (<a href="mailto:<%= cls.instructorEmail %>"><%= cls.instructorEmail %></a>)
+                                <% } %>
+                              </div>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                              <a href="/instructor/classes#class-<%= cls.id %>" class="btn btn-outline-primary btn-sm">
+                                View class
+                              </a>
+                              <a href="/instructor/classes/<%= cls.id %>/assign-students" class="btn btn-outline-secondary btn-sm">
+                                Assign students
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      <% }) %>
+                    </div>
+                  <% } else { %>
+                    <div class="alert alert-light border mt-3 mb-0 small">
+                      No classes have been created for this course yet.
+                    </div>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
+<%- include('partials/footer') %>

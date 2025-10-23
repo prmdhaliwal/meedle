@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
+const Course = require("../models/course");
 const { Classroom, ClassEnrollment } = require("../models/class");
 
 function requireLogin(req, res, next) {
@@ -174,7 +175,7 @@ router.get("/classes/:id/assign-students", requireLogin, requireRole("teacher"),
   });
 
   // unassign a student to a class
-  router.post("/classes/:id/unassign-students", requireLogin, requireRole("teacher"), async (req, res) => {
+router.post("/classes/:id/unassign-students", requireLogin, requireRole("teacher"), async (req, res) => {
     try {
         const classId = req.params.id;
         const { studentId } = req.body;
@@ -191,6 +192,52 @@ router.get("/classes/:id/assign-students", requireLogin, requireRole("teacher"),
       }
   });
   
-  
+// show all courses with their classes for instructors
+router.get("/courses", requireLogin, requireRole("teacher"), async (req, res) => {
+    try {
+        const [courses, classes] = await Promise.all([
+            Course.find({}).lean(),
+            Classroom.find({}).populate("instructor").lean()
+        ]);
+
+        const classesByCourse = new Map();
+        classes.forEach((cls) => {
+            const courseId = cls.course ? cls.course.toString() : "";
+            if (!courseId) return;
+            const list = classesByCourse.get(courseId) || [];
+            list.push({
+                id: cls._id.toString(),
+                title: cls.title || "(Untitled class)",
+                term: cls.term || "",
+                instructorName: cls.instructor ? cls.instructor.name : "TBA",
+                instructorEmail: cls.instructor ? cls.instructor.email : "",
+            });
+            classesByCourse.set(courseId, list);
+        });
+
+        const courseViews = courses.map((course) => {
+            const id = course._id.toString();
+            const classList = classesByCourse.get(id) || [];
+            return {
+                id,
+                code: course.code || "",
+                title: course.title || "(Untitled course)",
+                description: course.description || "",
+                classCount: classList.length,
+                classes: classList
+            };
+        });
+
+        res.render("instructor-courses", {
+            user: global.currentUser,
+            courses: courseViews
+        });
+    } catch (err) {
+        console.error("Failed to load instructor courses", err);
+        res.status(500).send("Error loading courses");
+    }
+});
+
+
 
 module.exports = router;

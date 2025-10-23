@@ -19,7 +19,7 @@
       <div class="row g-3">
         <% if (classes && classes.length > 0) { %>
           <% classes.forEach(function(c){ %>
-            <div class="col-12 col-md-6 col-lg-4">
+            <div class="col-12 col-md-6 col-lg-4" id="class-<%= c._id %>">
               <div class="card h-100 shadow-sm">
                 <div class="card-body">
                   <h5 class="card-title"><%= c.course.code %> - <%= c.title %></h5>
