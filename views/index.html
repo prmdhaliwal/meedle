@@ -33,18 +33,20 @@
                                         </span>
                                         <h5 class="card-title mb-1"><%= c.title %></h5>
                                         <p class="card-text text-muted mb-0"><%= c.term %></p>
-                                        <% if (c.lessons && c.lessons.length) { %>
-                                            <div class="mt-3">
-                                                <a href="/lessons/<%= c.lessons[0]._id %>" class="btn btn-sm btn-primary w-100">View Lesson</a>
-                                                <% if (c.lessons.length > 1) { %>
-                                                    <div class="text-muted small mt-1 text-center">
-                                                        + <%= c.lessons.length - 1 %> more lesson<%= (c.lessons.length - 1) === 1 ? "" : "s" %> assigned
-                                                    </div>
+                                        <div class="mt-3">
+                                            <% if (c.classId) { %>
+                                                <a href="/student/classes/<%= c.classId %>" class="btn btn-sm btn-primary w-100">Open Class</a>
+                                            <% } else { %>
+                                                <div class="btn btn-sm btn-secondary w-100 disabled">Class unavailable</div>
+                                            <% } %>
+                                            <div class="text-muted small mt-2 text-center">
+                                                <% if (c.lessons && c.lessons.length) { %>
+                                                    <%= c.lessons.length %> lesson<%= c.lessons.length === 1 ? "" : "s" %> assigned
+                                                <% } else { %>
+                                                    No lessons assigned yet
                                                 <% } %>
                                             </div>
-                                        <% } else { %>
-                                            <div class="mt-3 text-muted small text-center">No lessons assigned yet</div>
-                                        <% } %>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
