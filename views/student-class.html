@@ -1,0 +1,113 @@
+<%- include('partials/header') %>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Class Overview</title>
+    <link href="/bootstrap.min.css" rel="stylesheet" />
+  </head>
+  <body class="bg-light">
+    <main>
+      <div class="album p-3 mb-4">
+        <h1 class="text-center">
+          <%= classroom.courseCode %> - <%= classroom.title %>
+        </h1>
+        <% if (classroom.term) { %>
+          <p class="text-center text-muted mb-0"><%= classroom.term %></p>
+        <% } %>
+      </div>
+
+      <div class="container" style="max-width: 900px;">
+        <% const backToClassesUrl = classroom.courseId ? ("/student/classes?course=" + classroom.courseId) : "/student/classes"; %>
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <a href="<%= backToClassesUrl %>" class="btn btn-link p-0">&larr; Back to Classes</a>
+          <a href="/" class="btn btn-outline-secondary btn-sm">Dashboard</a>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5 class="card-title text-primary mb-3">Class Details</h5>
+            <p class="mb-1"><strong>Course:</strong> <%= classroom.courseCode %> - <%= classroom.courseTitle %></p>
+            <p class="mb-1"><strong>Instructor:</strong> <%= classroom.instructorName || "TBA" %></p>
+            <% if (classroom.instructorEmail) { %>
+              <p class="mb-0">
+                <strong>Email:</strong>
+                <a href="mailto:<%= classroom.instructorEmail %>"><%= classroom.instructorEmail %></a>
+              </p>
+            <% } %>
+          </div>
+        </div>
+
+        <div class="alert alert-secondary">
+          <strong>Opens:</strong> <%= accessInfo.opensText || "Immediately" %> -
+          <strong>Closes:</strong> <%= accessInfo.closesText || "Stays open" %>
+        </div>
+
+        <% if (accessInfo.locked) { %>
+          <div class="alert alert-warning">
+            <% if (accessInfo.reason === "before" && accessInfo.opensText) { %>
+              This class unlocks at <%= accessInfo.opensText %>.
+            <% } else if (accessInfo.reason === "after" && accessInfo.closesText) { %>
+              This class closed at <%= accessInfo.closesText %>.
+            <% } else { %>
+              This class is currently unavailable.
+            <% } %>
+          </div>
+        <% } %>
+
+        <h3 class="mb-3">Class Lessons</h3>
+        <% if (!lessons || lessons.length === 0) { %>
+          <div class="alert alert-secondary">No lessons have been assigned to this class yet.</div>
+        <% } %>
+
+        <% lessons.forEach(function(lesson){ %>
+          <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+              <h4 class="card-title"><%= lesson.title %></h4>
+
+              <% if (canViewContent) { %>
+                <pre class="bg-white p-3 border rounded" style="white-space: pre-wrap;"><%= lesson.content || "" %></pre>
+              <% } else { %>
+                <div class="bg-white p-3 border rounded text-muted">
+                  Lesson content is locked until the class opens.
+                </div>
+              <% } %>
+
+              <h5 class="mt-4">Assignments</h5>
+              <% if (lesson.assignments && lesson.assignments.length > 0) { %>
+                <ul class="list-group">
+                  <% lesson.assignments.forEach(function(a){ %>
+                    <li class="list-group-item">
+                      <div class="fw-semibold"><%= a.title %></div>
+                      <% if (a.weighting) { %>
+                        <div class="text-muted small">Weighting: <%= a.weighting %>%</div>
+                      <% } %>
+                      <% if (a.body) { %>
+                        <pre class="bg-white border rounded mt-2 p-2" style="white-space: pre-wrap;"><%= a.body %></pre>
+                      <% } %>
+
+                      <div class="mt-2">
+                        <% if (a.isSubmitted) { %>
+                          <span class="badge bg-secondary">Submitted</span>
+                        <% } else if (canViewContent) { %>
+                          <a href="/submission/new?assignmentId=<%= a._id %>" class="btn btn-outline-primary btn-sm">Submit Assignment</a>
+                        <% } else { %>
+                          <span class="badge bg-warning text-dark">Opens soon</span>
+                        <% } %>
+                      </div>
+                    </li>
+                  <% }) %>
+                </ul>
+              <% } else { %>
+                <div class="text-muted small">No assignments linked to this lesson.</div>
+              <% } %>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </main>
+  </body>
+</html>
+<%- include('partials/footer') %>

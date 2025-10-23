@@ -1,43 +1,75 @@
 <%- include('partials/header') %>
 
-<div class="album p-3 mb-5 ">
-  <h1 class="text-center text-white"><%= course.code %> - <%= course.title %></h1>
-</div>
-
-<div class="container" style="max-width: 800px;">
-  
-  <!-- Instructor Contact Information -->
-  <% if (typeof instructor !== 'undefined' && instructor) { %>
-    <div class="card mb-4" style="background-color: #f8f9fa;">
-      <div class="card-body">
-        <h5 class="card-title text-primary">Instructor Contact</h5>
-        <p class="mb-1">
-          <strong>Name:</strong> <%= instructor.name %>
-        </p>
-        <p class="mb-0">
-          <strong>Email:</strong> 
-          <a href="mailto:<%= instructor.email %>" style="color: #0d6efd; text-decoration: none;">
-            <%= instructor.email %>
-          </a>
-        </p>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Classes</title>
+    <link href="/bootstrap.min.css" rel="stylesheet" />
+  </head>
+  <body class="bg-light">
+    <main>
+      <div class="album p-3 mb-5">
+        <h1 class="text-center text-dark">My Classes</h1>
+        <% if (selectedCourse) { %>
+          <p class="text-center text-muted mb-0">
+            Showing classes for <%= selectedCourse.courseCode %> - <%= selectedCourse.courseTitle %>
+          </p>
+        <% } %>
       </div>
-    </div>
-  <% } %>
 
-  <!-- Lessons Section -->
-  <h3 class="mb-3">Course Lessons</h3>
-  <% if (!lessons || lessons.length === 0) { %>
-    <div class="alert alert-secondary">No lessons available for this course yet.</div>
-  <% } else { %>
-    <div class="list-group">
-      <% lessons.forEach(function(lesson){ %>
-        <a href="/lessons/<%= lesson._id %>" class="list-group-item list-group-item-action">
-          <h5 class="mb-1"><%= lesson.title %></h5>
-          <p class="mb-0 text-muted"><%= (lesson.content || "").slice(0,150) %><%= (lesson.content && lesson.content.length > 150) ? "…" : "" %></p>
-        </a>
-      <% }) %>
-    </div>
-  <% } %>
-</div>
+      <div class="container" style="max-width: 980px;">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <a href="/" class="btn btn-link p-0">&larr; Back to Dashboard</a>
+          <% if (hasFilter) { %>
+            <a href="/student/classes" class="btn btn-outline-primary btn-sm">View all classes</a>
+          <% } else { %>
+            <a href="/student/courses" class="btn btn-outline-primary btn-sm">My Courses</a>
+          <% } %>
+        </div>
 
+        <% if (message) { %>
+          <div class="alert alert-info"><%= message %></div>
+        <% } %>
+
+        <% if (!classes || classes.length === 0) { %>
+          <div class="alert alert-secondary">
+            <% if (hasFilter) { %>
+              No classes found for this course yet.
+            <% } else { %>
+              You're not enrolled in any classes yet.
+            <% } %>
+          </div>
+        <% } %>
+
+        <div class="row g-3">
+          <% (classes || []).forEach(function(c){ %>
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                  <h5 class="card-title mb-1"><%= c.courseCode %> - <%= c.title %></h5>
+                  <p class="card-text text-muted small mb-1"><%= c.term || "" %></p>
+                  <p class="card-text small mb-2">
+                    Instructor: <%= c.instructorName %>
+                    <% if (c.instructorEmail) { %>
+                      (<a href="mailto:<%= c.instructorEmail %>"><%= c.instructorEmail %></a>)
+                    <% } %>
+                  </p>
+                  <div class="text-muted small mb-3">
+                    <%= c.lessonCount %> lesson<%= c.lessonCount === 1 ? "" : "s" %> assigned
+                  </div>
+
+                  <div class="mt-auto">
+                    <a href="/student/classes/<%= c.id %>" class="btn btn-sm btn-primary w-100">Open Class</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
 <%- include('partials/footer') %>

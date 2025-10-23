@@ -15,9 +15,11 @@
       </div>
 
       <div class="container" style="max-width: 980px;">
+        <a href="/" class="btn btn-link p-0 mb-3">&larr; Back to Dashboard</a>
+
         <!-- small header with count + manage button -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <div class="text-muted">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <div class="text-muted mb-0">
             <%= courses && courses.length ? courses.length : 0 %> course<%= (courses && courses.length === 1) ? "" : "s" %>
           </div>
           <a class="btn btn-primary" href="/student/manage-enrollments">Manage Enrollments</a>
@@ -26,7 +28,7 @@
         <!-- Empty state -->
         <% if (!courses || courses.length === 0) { %>
           <div class="alert alert-secondary">
-            You’re not enrolled in any courses yet. Click <strong>Manage Enrollments</strong> to get started.
+            You're not enrolled in any courses yet. Click <strong>Manage Enrollments</strong> to get started.
           </div>
         <% } %>
 
@@ -40,7 +42,7 @@
                   <p class="card-text text-muted small mb-0"><%= c.description || "" %></p>
 
                   <div class="mt-auto">
-                    <a href="/courses/<%= c._id %>/lessons" class="btn btn-sm btn-outline-primary w-100">View Lessons</a>
+                    <a href="/student/classes?course=<%= c._id %>" class="btn btn-sm btn-outline-primary w-100">View Classes</a>
                   </div>
                 </div>
               </div>
