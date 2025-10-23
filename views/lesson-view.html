@@ -30,9 +30,9 @@
   <% } %>
 
   <% if (canViewContent) { %>
-    <pre class="bg-white p-3 border rounded"><%= lesson.content || '' %></pre>
+    <pre class="p-3 border rounded"><%= lesson.content || '' %></pre>
   <% } else { %>
-    <div class="bg-white p-3 border rounded text-muted">Content unavailable outside the access window.</div>
+    <div class="p-3 border rounded text-muted">Content unavailable outside the access window.</div>
   <% } %>
 </div>
 
@@ -48,7 +48,7 @@
             <div style="color:#6b7280; font-size:13px;">Weighting: <%= a.weighting %>%</div>
           <% } %>
           <% if (a.body) { %>
-            <pre class="bg-white p-2 border rounded mt-2" style="white-space:pre-wrap;"><%= a.body %></pre>
+            <pre class="p-2 border rounded mt-2" style="white-space:pre-wrap;"><%= a.body %></pre>
           <% } %>
 
           <div class="mt-2">
