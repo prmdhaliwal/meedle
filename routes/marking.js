@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const Assignment = require("../models/assignments");
 const Submission = require("../models/submission");
-const User = require("../models/User");
+const User = require("../models/user");
 const { Lesson } = require("../models/lesson"); // Changed to destructure
 const Enrollment = require("../models/enrollment");
 

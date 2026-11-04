@@ -2,7 +2,8 @@ const express = require("express");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
 const app = express();
-const PORT_NUMBER = 8080;
+const PORT_NUMBER = Number(process.env.PORT || 8080);
+const HOST = process.env.HOST || "127.0.0.1";
 const studentCourses = require("./routes/studentcourses")
 const studentClasses = require("./routes/studentclasses.js")
 const instructorClasses = require("./routes/instructorclasses.js")
@@ -139,7 +140,7 @@ app.use("/", assignmentRoutes)
 app.use("/", reportsRoutes)
 app.use("/", markingRoutes);
 
-app.listen(PORT_NUMBER, function(){
-    console.log("Listening at http://localhost:" + PORT_NUMBER);
+app.listen(PORT_NUMBER, HOST, function(){
+    console.log("Listening at http://" + HOST + ":" + PORT_NUMBER);
 } );
 

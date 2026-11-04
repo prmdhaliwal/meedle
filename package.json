@@ -1,14 +1,15 @@
 {
-  "name": "cl_friday4pm_team3",
+  "name": "meedle",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Meedle: a team-built learning management system using Express, MongoDB and EJS.",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js",
+    "test": "node --test test/*.test.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://git.infotech.monash.edu/fit2101/fit2101-s2-2025/group-repo/CL_Friday4pm_Team3.git"
+    "url": "https://github.com/prmdhaliwal/meedle.git"
   },
   "keywords": [],
   "author": "",
